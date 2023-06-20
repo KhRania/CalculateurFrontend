@@ -4,6 +4,8 @@ body , html {
     background-position: center;
     background-repeat: no-repeat;
     background-size: cover;
+    padding: 0;
+    margin: 0;
 }
 .div1{
   
@@ -33,9 +35,6 @@ body , html {
 .field {
     background-color: white;
     border-radius: 5px;
-}
-.btn1 {
-
 }
 
 @font-face {

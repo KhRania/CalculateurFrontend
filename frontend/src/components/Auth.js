@@ -3,6 +3,7 @@ import { Box , Button, Input, TextField, Typography, inputBaseClasses } from "@m
 import AppRegistrationOutlinedIcon from '@mui/icons-material/AppRegistrationOutlined';
 import LoginOutlinedIcon from '@mui/icons-material/LoginOutlined';
 import '../css/Auth.css';
+import { Link } from "react-router-dom";
 
 const Auth = () => {
     const [isSignup, setIsSignup] = useState(false);
@@ -63,14 +64,17 @@ const Auth = () => {
                     variant="outlined" 
                     placeholder="Password"/>
 
+                 <Link to='/Myprojects'>
                     <Button className="btn1"
-                    endIcon={isSignup ? <AppRegistrationOutlinedIcon/> : <LoginOutlinedIcon/>}
-                    type="submit"
-                    sx={{marginTop:3, borderRadius:3}} 
-                    variant="oulined" 
-                    style={{'background-color':'blue', 'color':'white'}} 
-                    > {isSignup ? "Signup" : "login"}
+                      endIcon={isSignup ? <AppRegistrationOutlinedIcon/> : <LoginOutlinedIcon/>}
+                      type="submit"
+                      sx={{marginTop:3, borderRadius:3}} 
+                      variant="oulined" 
+                      style={{'background-color':'blue', 'color':'white'}} 
+                      > {isSignup ? "Signup" : "login"}
                     </Button>
+                 </Link>
+                    
 
                     <Button  className="btn2"
                     endIcon={isSignup ? <LoginOutlinedIcon/> : <AppRegistrationOutlinedIcon/>}
