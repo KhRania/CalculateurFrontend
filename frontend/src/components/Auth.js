@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { Box , Button, Input, TextField, Typography, inputBaseClasses } from "@mui/material";
 import AppRegistrationOutlinedIcon from '@mui/icons-material/AppRegistrationOutlined';
 import LoginOutlinedIcon from '@mui/icons-material/LoginOutlined';
+import '../css/Auth.css';
+
 const Auth = () => {
     const [isSignup, setIsSignup] = useState(false);
     const [inputs, setInputs] = useState({
@@ -23,30 +25,16 @@ const Auth = () => {
         setIsSignup(!isSignup);
         setInputs({ name: "", email: "", password: ""});
     };
-    return (
-        <div>
-            <form onSubmit={handleSubmit}>
-                <Box 
-                display="flex" 
-                flexDirection={"column"} 
-                maxWidth={400} 
-                alignItems="center" 
-                justifyContent="center"
-                margin="auto"
-                marginTop={5}
-                padding={3}
-                borderRadius={5}
-                boxShadow={"5px 5px 10px 5px #ccc"}
-                sx={{
-                    ":hover":{
-                        boxShadow: '5px 10px 20px #ccc',
-                    },
-                }}>
-                    <Typography variant="h2" padding={3} textAlign="center">
+    return ( 
+        <div className="div1">
+            <form className="form" onSubmit={handleSubmit}>
+                <Box className="box" >
+                    <Typography className="typo" variant="h2" padding={3} textAlign="center">
                         {isSignup ? "Sign Up" : "Login"}
                     </Typography>
                     
-                    { isSignup && (<TextField  
+                    { isSignup && (<TextField 
+                    className="field" 
                     onChange={handleChange}
                     name="name" 
                     value={inputs.name}
@@ -56,6 +44,7 @@ const Auth = () => {
                     placeholder="Name"/> 
                     )}
                     <TextField 
+                    className="field"
                     onChange={handleChange}
                     name="email"
                     value={inputs.email}
@@ -64,7 +53,8 @@ const Auth = () => {
                     varient="outlined" 
                     placeholder="Email"/>
                     
-                    <TextField                     
+                    <TextField  
+                    className="field"                   
                     onChange={handleChange}
                     name="password"
                     value={inputs.password}
@@ -73,7 +63,7 @@ const Auth = () => {
                     variant="outlined" 
                     placeholder="Password"/>
 
-                    <Button 
+                    <Button className="btn1"
                     endIcon={isSignup ? <AppRegistrationOutlinedIcon/> : <LoginOutlinedIcon/>}
                     type="submit"
                     sx={{marginTop:3, borderRadius:3}} 
@@ -82,7 +72,7 @@ const Auth = () => {
                     > {isSignup ? "Signup" : "login"}
                     </Button>
 
-                    <Button  
+                    <Button  className="btn2"
                     endIcon={isSignup ? <LoginOutlinedIcon/> : <AppRegistrationOutlinedIcon/>}
                     onClick={resetState} 
                     sx={{marginTop:3, borderRadius:3}} 
