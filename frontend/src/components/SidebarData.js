@@ -5,18 +5,21 @@ import React from 'react'
 
 export const SidebarData = [
     {
-        title: "My Projects",
+        title: "Home",
         icon: <HomeIcon />,
-        link: "/Myprojects"
+        link: "/Home",
+        cName: 'nav-text'
     },
     {
         title: "Profile",
         icon: <PersonIcon />,
-        link: "/Profile"
+        link: "/Profile",
+        cName: 'nav-text'
     },
     {
         title: "Log out",
         icon: <LogoutIcon />,
-        link: "/"
+        link: "/",
+        cName: 'nav-text'
     },
 ]

@@ -64,7 +64,7 @@ const Auth = () => {
                     variant="outlined" 
                     placeholder="Password"/>
 
-                 <Link to='/Myprojects'>
+                 <Link to='/Home'>
                     <Button className="btn1"
                       endIcon={isSignup ? <AppRegistrationOutlinedIcon/> : <LoginOutlinedIcon/>}
                       type="submit"
