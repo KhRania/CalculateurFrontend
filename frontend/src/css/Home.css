@@ -1,0 +1,15 @@
+.page {
+    margin-top: 2rem;
+    margin-left : 20rem;
+    margin-right: 50rem;
+    opacity: 0.8; 
+    flex: auto;
+    
+}
+.page1 {
+    margin-top: 2rem;
+    margin-left : 20rem;
+    margin-right: 40rem;
+    opacity: 0.8; 
+    flex: auto;
+}

@@ -2,7 +2,7 @@
     background-color: #2f4050;
     height: 3rem;
     display: flex;
-    justify-content: start;
+    justify-content: flex-start;
     align-items: center;
   }
   
@@ -23,11 +23,12 @@
     width: 220px;
     height: 100vh;
     display: flex;
-    justify-content: start;
+    justify-content: flex-start;
     position: fixed;
     top: 0;
     left: -100%;
     transition: 850ms;
+    z-index: 999;
   }
   
   .nav-menu.active {
@@ -37,7 +38,7 @@
   
   .nav-text {
     display: flex;
-    justify-content: start;
+    justify-content: flex-start;
     align-items: flex-start;
     padding: 8px 0px 8px 0px;
     list-style: none;
@@ -69,7 +70,7 @@
     width: 100%;
     height: 40px;
     display: flex;
-    justify-content: start;
+    justify-content: flex-start;
     align-items: center;
     border-radius: 4px;
     

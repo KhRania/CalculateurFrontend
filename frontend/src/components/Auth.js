@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Box , Button, Input, TextField, Typography, inputBaseClasses } from "@mui/material";
+import { Box , Button, TextField, Typography } from "@mui/material";
 import AppRegistrationOutlinedIcon from '@mui/icons-material/AppRegistrationOutlined';
 import LoginOutlinedIcon from '@mui/icons-material/LoginOutlined';
 import '../css/Auth.css';
