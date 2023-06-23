@@ -21,6 +21,8 @@ import Switch from '@mui/material/Switch';
 import DeleteIcon from '@mui/icons-material/Delete';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import { visuallyHidden } from '@mui/utils';
+import { Button, Grid } from '@mui/material';
+import {Link } from 'react-router-dom';
 
 function createData(name, adress) {
   return {
@@ -329,7 +331,7 @@ export default function EnhancedTable() {
               {emptyRows > 0 && (
                 <TableRow
                   style={{
-                    height: (dense ? 33 : 53) * emptyRows,
+                    height: (dense ? 33 : 33) * emptyRows,
                   }}
                 >
                   <TableCell colSpan={6} />
@@ -338,6 +340,7 @@ export default function EnhancedTable() {
             </TableBody>
           </Table>
         </TableContainer>
+        <Grid style={{display: 'inline-flex'}}>
         <TablePagination
           rowsPerPageOptions={[5, 10]}
           component="div"
@@ -348,6 +351,22 @@ export default function EnhancedTable() {
           onRowsPerPageChange={handleChangeRowsPerPage}
         
         />
+        <Link to="/createProject">
+        <Button 
+          style={{'background-color':'#1a83ff', 'color':'white'}} 
+          variant='outlined'
+          sx={{ marginLeft: 57, 
+          borderRadius: 2 , 
+          marginTop: 1, 
+          marginBottom:1,
+          
+          }}>
+            create project
+        </Button>
+        </Link>
+        
+        </Grid>
+      
       </Paper>
       
     </Box>
