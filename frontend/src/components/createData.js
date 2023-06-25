@@ -171,7 +171,7 @@ function EnhancedTableToolbar(props) {
           {numSelected} selected
         </Typography>
       ) : (
-        <Typography
+           <Typography
           sx={{ flex: '1 1 100%' }}
           variant="h6"
           id="tableTitle"
@@ -188,11 +188,29 @@ function EnhancedTableToolbar(props) {
           </IconButton>
         </Tooltip>
       ) : (
+        <Box sx={{ 
+        display: 'flex'}} > 
+        <Link to="/createProject">
+        <Button 
+          style={{'background-color':'#1a83ff', 'color':'white',
+         'width': 139}} 
+          variant='outlined'
+          sx={{  
+          marginRight: 2,
+          borderRadius: 2,
+          }}>
+            new project
+        </Button>
+        </Link>
         <Tooltip title="Filter list">
+          <Box>
           <IconButton>
             <FilterListIcon />
           </IconButton>
+          </Box>
         </Tooltip>
+        </Box>
+
       )}
     </Toolbar>
   );
@@ -351,19 +369,7 @@ export default function EnhancedTable() {
           onRowsPerPageChange={handleChangeRowsPerPage}
         
         />
-        <Link to="/createProject">
-        <Button 
-          style={{'background-color':'#1a83ff', 'color':'white'}} 
-          variant='outlined'
-          sx={{ marginLeft: 57, 
-          borderRadius: 2 , 
-          marginTop: 1, 
-          marginBottom:1,
-          
-          }}>
-            create project
-        </Button>
-        </Link>
+        
         
         </Grid>
       
