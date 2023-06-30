@@ -1,8 +1,9 @@
 .proj-creation {
-    height: 34rem;
+    height: 100%;
     margin-top: 2rem;
     margin-left : 22%;
     margin-right: 4%;
     opacity: 0.8; 
-    flex: content;
+    flex:content; 
+    
 }

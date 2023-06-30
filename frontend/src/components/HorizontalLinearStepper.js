@@ -6,8 +6,8 @@ import StepLabel from '@mui/material/StepLabel';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import PropsFields from './PropsFields';
-
-const steps = ['Step 1', 'Step 2', 'Step 3'];
+import PropsFields2 from './PropsFields2'
+const steps = ['', '', ''];
 
 export default function HorizontalLinearStepper() {
   const [activeStep, setActiveStep] = React.useState(0);
@@ -25,29 +25,41 @@ export default function HorizontalLinearStepper() {
     setActiveStep(0);
   };
 
+  const getStepLabel = (stepIndex) => {
+    if (stepIndex === 0) {
+      return 'Step One';
+    } else if (stepIndex === 1) {
+      return 'Step Two';
+    } else if (stepIndex === 2) {
+      return 'Step Three';
+    }
+    return '';
+  };
+
   return (
     <Box sx={{ width: '100%' }}>
       <Stepper activeStep={activeStep}>
-        {steps.map((label, index) => {
+        {steps.map((_, index) => {
           const stepProps = {};
           const labelProps = {};
           return (
             <Step sx={{
                 marginTop: 1 }}  
-                key={label} {...stepProps}>
-              <StepLabel {...labelProps}>{label}</StepLabel>
+                key={index} {...stepProps}>
+              <StepLabel {...labelProps}>{getStepLabel(index)}</StepLabel>
             </Step>
           );
         })}
         
       </Stepper>
       {activeStep === 0 && <PropsFields/>}
+      {activeStep === 1 && <PropsFields2/>}
       {activeStep === steps.length ? (
         <React.Fragment>
           <Typography sx={{ mt: 2, mb: 1 }}>
             All steps completed - you&apos;re finished
           </Typography>
-          <Box sx={{ display: 'flex', flexDirection: 'row', pt: 2 }}>
+          <Box sx={{ display: 'flex', flexDirection: 'row', pt: 2 ,marginRight: 1 }}>
             <Box sx={{ flex: '1 1 auto' }} />
             <Button onClick={handleReset} 
             style={{'background-color':'#1a83ff', 'color':'white'}} >Reset</Button>
@@ -55,9 +67,9 @@ export default function HorizontalLinearStepper() {
         </React.Fragment>
       ) : (
         <React.Fragment>
-          <Typography sx={{ mt: 2, mb: 1 }}>Step {activeStep + 1}</Typography>
-          <Box sx={{ display: 'flex', flexDirection: 'row', pt: 2 }}>
-            <Button
+          <Box sx={{ display: 'flex', flexDirection: 'row', pt: 1 , marginRight: 1 , marginLeft: 1 }}>
+            {activeStep !== 0 && (
+              <Button
               color="inherit"
               disabled={activeStep === 0}
               onClick={handleBack}
@@ -66,6 +78,8 @@ export default function HorizontalLinearStepper() {
             >
               Back
             </Button>
+            )}
+            
             <Box sx={{ flex: '1 1 auto' }} />
             <Button onClick={handleNext}
             style={{'background-color':'#1a83ff', 'color':'white'}} >
