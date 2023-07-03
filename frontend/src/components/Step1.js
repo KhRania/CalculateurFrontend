@@ -100,11 +100,11 @@ const Step1 = ({ handleNext }) => {
     }
   };
 
-  const isNextButtonDisabled = projectName === '' || address === '' ;
+  const isNextButtonDisabled = projectName === '' || address === '';
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column' }}>
-      <div style={{ display: 'flex' }}>
+      <div style={{ display: 'flex'}}>
         <Box
           component="form"
           sx={{
@@ -144,14 +144,14 @@ const Step1 = ({ handleNext }) => {
           </div>
         </Box>
         <div style={{ flex: 1 , marginTop: '1rem' ,marginRight:'1rem'}}>
-          <div id="map" style={{ height: '24rem' }} ref={mapContainerRef}></div>
+          <div id="map" style={{ height: '35rem' }} ref={mapContainerRef}></div>
         </div>
       </div>
-      <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '17rem' , marginRight: '1rem'}}>
+      <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '6rem' , marginRight: '1rem'}}>
         <Button
           disabled={isNextButtonDisabled}
           onClick={handleNext}
-          style={{ backgroundColor: '#1a83ff', color: 'white' }}
+          style={{ backgroundColor: isNextButtonDisabled ? 'gray' : '#1a83ff', color: 'white' }}
         >
           Next
         </Button>
