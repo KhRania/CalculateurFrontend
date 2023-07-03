@@ -58,15 +58,15 @@ $ npm start
 
 4. Authenticate by writing an email and a password.
 
-![Login page ](src\assets\login_rm.png)
+![Login page ](src/assets/login_rm.png)
 
 5. After authentication you will be redirected to a main page where you can visulaize your previous projects or you can create a new porject by clicking on the create project button.
 
-![Home page ](src\assets\home_rm.png)
+![Home page ](src/assets/home_rm.png)
 
 6. Once the previous step is done , fill in the blanks the necessary information then click on next to move to the next step . It is possible also to backtrack steps and add necessary modifications.
 
-![Creation page ](src\assets\creation_rm.png)
+![Creation page ](src/assets/creation_rm.png)
 
 7. Once all the steps are done , click on finish and that will automotically save your project and you will be able to visualize , delete or edit it in the home page.
 
