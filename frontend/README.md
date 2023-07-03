@@ -1,70 +1,125 @@
-# Getting Started with Create React App
+# CalculateurFrontend
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+This react app project comprises of a website that guides you through the process of configuring your solar panel installation at home, including address selection, terrain selection, material selection, and the ability to personalize the right locations for your solar panels. 
 
-## Available Scripts
 
-In the project directory, you can run:
+## Table of content
 
-### `npm start`
+* [Installation](#installation)
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+* [Usage](#usage)
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+* [Features](#features)
 
-### `npm test`
+* [API Documentation](#api-documentation)
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+* [Contact Information](#contact-information)
 
-### `npm run build`
+* [Aknowledgments](#acknowledgments)
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+## Installation
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+1. Clone the repository: 
 
-### `npm run eject`
+```
+$ git clone https://github.com/KhRania/CalculateurFrontend
+```
+2. Install dependencies: 
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+```
+$ cd frontend
+$ npm install
+```
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+3. Enter your Mapbox API key in `Step1.js`: 
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+```
+mapboxgl.accessToken ='YOUR_KEY_HERE'
+```
+_note: you must create a Mapbox account to get the API key_
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
 
-## Learn More
+## Usage
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+1. Access the `frontend` folder: 
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+```
+$ cd frontend
+```
+2. Run the development server: 
 
-### Code Splitting
+```
+$ npm start
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+3. Open the project in your browser at:
+`http://localhost:3000`
 
-### Analyzing the Bundle Size
+4. Authenticate by writing an email and a password.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+![Login page ](src\assets\login_rm.png)
 
-### Making a Progressive Web App
+5. After authentication you will be redirected to a main page where you can visulaize your previous projects or you can create a new porject by clicking on the create project button.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+![Home page ](src\assets\home_rm.png)
 
-### Advanced Configuration
+6. Once the previous step is done , fill in the blanks the necessary information then click on next to move to the next step . It is possible also to backtrack steps and add necessary modifications.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+![Creation page ](src\assets\creation_rm.png)
 
-### Deployment
+7. Once all the steps are done , click on finish and that will automotically save your project and you will be able to visualize , delete or edit it in the home page.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+8. Once you are done click on "Log out" on the side bar to exit the authentication page.
 
-### `npm run build` fails to minify
+_you can also consult your profile by click on "profile" on the side bar and edit your information._
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+## Features
+
+### Material UI
+
+Material-UI is a popular open-source library for building user interfaces in React applications. It provides a set of pre-designed and customizable UI components that follow the Material Design guidelines created by Google. Material-UI allows developers to create modern and visually appealing UIs with ease.
+
+**Documentation :** https://mui.com/material-ui/getting-started/overview/
+
+Some components used in this project : Stepper, Step, Steplabel, Box, Textfield, Paper, Typography, MUI icons, button .
+
+### React Router 
+
+React Router is a popular routing library for React applications. It allows you to handle routing and navigation in a declarative way, enabling you to create single-page applications (SPAs) with multiple views or pages.
+
+React Router provides a set of components that enable you to define routes and their corresponding components, and it ensures that the correct component is rendered based on the current URL. It also provides features like nested routes, route parameters, and query parameters.
+
+**Documentation :** https://reactrouter.com/en/main
+
+#### Implementation 
+
+* We wrapped the App component in the `index.js` file with the necessary Router type.
+
+```
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(
+  <React.StrictMode>
+    <BrowserRouter>
+    <App />
+    </BrowserRouter>
+  </React.StrictMode>
+); 
+````
+* We then imported 'react-router-dom' in App.js and wrapped the components inside Routes as follows :
+
+![App.js ](src\assets\appjs_rm.png)
+
+## API Documentation
+
+### Mapbox Geocoding API 
+
+We used the Mapbox Geocoding API to allow the user to find his address by writing it or locating it on the map.
+
+**Documentation :**  https://docs.mapbox.com/api/search/geocoding/
+
+## Contact Information
+
+Email : hedi.makhlouf@ensi-uma.tn
+
+## Acknowledgments 

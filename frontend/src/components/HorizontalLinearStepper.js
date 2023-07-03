@@ -3,10 +3,11 @@ import Box from '@mui/material/Box';
 import Stepper from '@mui/material/Stepper';
 import Step from '@mui/material/Step';
 import StepLabel from '@mui/material/StepLabel';
-import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
-import PropsFields from './PropsFields';
-import PropsFields2 from './PropsFields2'
+import Step2 from './Step2';
+import Step1 from './Step1';
+import { Button } from '@mui/material';
+
 const steps = ['', '', ''];
 
 export default function HorizontalLinearStepper() {
@@ -14,7 +15,6 @@ export default function HorizontalLinearStepper() {
 
   const handleNext = () => {
     setActiveStep((prevActiveStep) => prevActiveStep + 1);
-    
   };
 
   const handleBack = () => {
@@ -43,51 +43,26 @@ export default function HorizontalLinearStepper() {
           const stepProps = {};
           const labelProps = {};
           return (
-            <Step sx={{
-                marginTop: 1 }}  
-                key={index} {...stepProps}>
+            <Step sx={{ marginTop: 1 }} key={index} {...stepProps}>
               <StepLabel {...labelProps}>{getStepLabel(index)}</StepLabel>
             </Step>
           );
         })}
-        
       </Stepper>
-      {activeStep === 0 && <PropsFields/>}
-      {activeStep === 1 && <PropsFields2/>}
+      {activeStep === 0 && <Step1 handleNext={handleNext} handleBack={handleBack} />}
       {activeStep === steps.length ? (
         <React.Fragment>
           <Typography sx={{ mt: 2, mb: 1 }}>
             All steps completed - you&apos;re finished
           </Typography>
-          <Box sx={{ display: 'flex', flexDirection: 'row', pt: 2 ,marginRight: 1 }}>
+          <Box sx={{ display: 'flex', flexDirection: 'row', pt: 2, marginRight: 1 }}>
             <Box sx={{ flex: '1 1 auto' }} />
-            <Button onClick={handleReset} 
-            style={{'background-color':'#1a83ff', 'color':'white'}} >Reset</Button>
-          </Box>
-        </React.Fragment>
-      ) : (
-        <React.Fragment>
-          <Box sx={{ display: 'flex', flexDirection: 'row', pt: 1 , marginRight: 1 , marginLeft: 1 }}>
-            {activeStep !== 0 && (
-              <Button
-              color="inherit"
-              disabled={activeStep === 0}
-              onClick={handleBack}
-              sx={{ mr: 1 }}
-              style={{'background-color':'#1a83ff', 'color':'white'}} 
-            >
-              Back
-            </Button>
-            )}
-            
-            <Box sx={{ flex: '1 1 auto' }} />
-            <Button onClick={handleNext}
-            style={{'background-color':'#1a83ff', 'color':'white'}} >
-              {activeStep === steps.length - 1 ? 'Finish' : 'Next'}
+            <Button onClick={handleReset} style={{ backgroundColor: '#1a83ff', color: 'white' }}>
+              Reset
             </Button>
           </Box>
         </React.Fragment>
-      )}
+      ) : null}
     </Box>
   );
 }

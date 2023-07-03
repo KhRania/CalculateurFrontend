@@ -1,8 +1,8 @@
 import React from 'react';
-import Sidebar from '../../components/Sidebar';
+import Sidebar from './Sidebar';
 import { Paper } from '@mui/material';
-import HorizontalLinearStepper from '../../components/HorizontalLinearStepper';
-import '../../css/ProjectCreation.css';
+import HorizontalLinearStepper from './HorizontalLinearStepper';
+import '../css/ProjectCreation.css';
 function ProjectCreation() {
   return (
     <>

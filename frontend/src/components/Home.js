@@ -1,9 +1,8 @@
 import React from 'react'
-//import ProjectsForm from './ProjectsForm';
-import Sidebar from '../../components/Sidebar';
+import Sidebar from './Sidebar';
 import { Paper } from '@mui/material';
-import '../../css/Home.css';
-import EnhancedTable from '../../components/createData';
+import '../css/Home.css';
+import EnhancedTable from './createData';
 
 function Home() {
   return (

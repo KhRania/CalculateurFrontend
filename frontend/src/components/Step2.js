@@ -2,7 +2,7 @@ import * as React from 'react';
 import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
 
-export default function PropsFields2() {
+export default function Step2() {
   return (
     <Box
       component="form"
