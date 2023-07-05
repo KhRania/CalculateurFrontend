@@ -22,6 +22,7 @@ import { visuallyHidden } from '@mui/utils';
 import { Button, Grid } from '@mui/material';
 import {Link } from 'react-router-dom';
 
+// Function to create a data object with the given name and address
 function createData(name, adress) {
   return {
     name,
@@ -29,6 +30,7 @@ function createData(name, adress) {
   };
 }
 
+// the data being displayed
 const rows = [
   createData('proj1', 'loool'),
   createData('hhhhhh', 452),
@@ -45,6 +47,7 @@ const rows = [
   createData('ahla', 437),
 ];
 
+// Function that compares 2 elements in a descending order
 function descendingComparator(a, b, orderBy) {
   if (b[orderBy] < a[orderBy]) {
     return -1;
@@ -55,12 +58,14 @@ function descendingComparator(a, b, orderBy) {
   return 0;
 }
 
+// get the comparator function based on order and orderBy variable
 function getComparator(order, orderBy) {
   return order === 'desc'
     ? (a, b) => descendingComparator(a, b, orderBy)
     : (a, b) => -descendingComparator(a, b, orderBy);
 }
 
+// sort the array based on the comparator function
 function stableSort(array, comparator) {
   const stabilizedThis = array.map((el, index) => [el, index]);
   stabilizedThis.sort((a, b) => {
@@ -73,6 +78,7 @@ function stableSort(array, comparator) {
   return stabilizedThis.map((el) => el[0]);
 }
 
+// array for the head cells of the table
 const headCells = [
   {
     id: 'name',
@@ -89,9 +95,12 @@ const headCells = [
  
 ];
 
+// table header component
 function EnhancedTableHead(props) {
   const { onSelectAllClick, order, orderBy, numSelected, rowCount, onRequestSort } =
     props;
+
+  // Handler for creating a sort handler for a given property
   const createSortHandler = (property) => (event) => {
     onRequestSort(event, property);
   };
@@ -99,6 +108,7 @@ function EnhancedTableHead(props) {
   return (
     <TableHead>
       <TableRow>
+        {/* Check box column */}
         <TableCell padding="checkbox">
           <Checkbox
             color="primary"
@@ -110,6 +120,7 @@ function EnhancedTableHead(props) {
             }}
           />
         </TableCell>
+        {/** the header cell */}
         {headCells.map((headCell) => (
           <TableCell
             key={headCell.id}
@@ -123,6 +134,7 @@ function EnhancedTableHead(props) {
               onClick={createSortHandler(headCell.id)}
             >
               {headCell.label}
+              {/** sort order indicator */}
               {orderBy === headCell.id ? (
                 <Box component="span" sx={visuallyHidden}>
                   {order === 'desc' ? 'sorted descending' : 'sorted ascending'}
@@ -136,6 +148,7 @@ function EnhancedTableHead(props) {
   );
 }
 
+// Props types for EnhancedTableHead component
 EnhancedTableHead.propTypes = {
   numSelected: PropTypes.number.isRequired,
   onRequestSort: PropTypes.func.isRequired,
@@ -145,6 +158,7 @@ EnhancedTableHead.propTypes = {
   rowCount: PropTypes.number.isRequired,
 };
 
+// Toolbar component for table
 function EnhancedTableToolbar(props) {
   const { numSelected } = props;
 
@@ -159,6 +173,7 @@ function EnhancedTableToolbar(props) {
         }),
       }}
     >
+      {/** Selected items text or table title shown */}
       {numSelected > 0 ? (
         <Typography
           sx={{ flex: '1 1 100%' }}
@@ -178,7 +193,7 @@ function EnhancedTableToolbar(props) {
           Created Projects
         </Typography>
       )}
-
+      { /** delete button or new project button and filter list button */}
       {numSelected > 0 ? (
         <Tooltip title="Delete">
           <IconButton>
@@ -192,7 +207,7 @@ function EnhancedTableToolbar(props) {
         <Button 
           style={{'background-color':'#1a83ff', 'color':'white',
          'width': 139}} 
-          variant='outlined'
+          
           sx={{  
           marginRight: 2,
           borderRadius: 2,
@@ -214,24 +229,28 @@ function EnhancedTableToolbar(props) {
   );
 }
 
+// Props types for  EnhancedTableToolbar component
 EnhancedTableToolbar.propTypes = {
   numSelected: PropTypes.number.isRequired,
 };
 
+// the main EnhancedTable Component
 export default function EnhancedTable() {
-  const [order, setOrder] = React.useState('asc');
-  const [orderBy, setOrderBy] = React.useState('adress');
-  const [selected, setSelected] = React.useState([]);
-  const [page, setPage] = React.useState(0);
-  const [dense, setDense] = React.useState(false);
-  const [rowsPerPage, setRowsPerPage] = React.useState(5);
+  const [order, setOrder] = React.useState('asc'); //  Sorting order (asc or desc)
+  const [orderBy, setOrderBy] = React.useState('adress'); // property sorted by
+  const [selected, setSelected] = React.useState([]); //selected rows
+  const [page, setPage] = React.useState(0); //current page number
+  const [dense, setDense] = React.useState(false); 
+  const [rowsPerPage, setRowsPerPage] = React.useState(5); //number of rows per page
 
+  // handle request for sorting
   const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === 'asc';
     setOrder(isAsc ? 'desc' : 'asc');
     setOrderBy(property);
   };
-
+  
+  // handle click on the checkbox in the table row
   const handleSelectAllClick = (event) => {
     if (event.target.checked) {
       const newSelected = rows.map((n) => n.name);
@@ -260,18 +279,20 @@ export default function EnhancedTable() {
 
     setSelected(newSelected);
   };
-
+  
+  // handle page change
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
   };
-
+  
+  // handle row per page change
   const handleChangeRowsPerPage = (event) => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
   };
 
   
-
+  // check if row is selected
   const isSelected = (name) => selected.indexOf(name) !== -1;
 
   const emptyRows =
@@ -289,7 +310,11 @@ export default function EnhancedTable() {
   return (
     <Box sx={{ width: '100%' }}>
       <Paper sx={{ width: '100%', mb: 2 }}>
+
+        {/** toolbar */}
         <EnhancedTableToolbar numSelected={selected.length} />
+
+        {/** table */}
         <TableContainer >
           <Table
             sx={{ minWidth: 600 }}

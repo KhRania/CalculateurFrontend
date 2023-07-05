@@ -7,29 +7,29 @@ import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined';
 import { IconContext } from 'react-icons';
 
 function Sidebar() {
-  const [sidebar, setSidebar] = useState(false);
-  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+  const [sidebar, setSidebar] = useState(false); // state for controlling the sidebar visibility
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth); // state for storing the window width
 
-  const showSidebar = () => setSidebar(!sidebar);
-  const location = useLocation();
-  const activeLink = location.pathname;
+  const showSidebar = () => setSidebar(!sidebar); // function that toggles sidebar visibility
+  const location = useLocation(); // acess the current location
+  const activeLink = location.pathname; // get the current active link
 
   const handleResize = () => {
-    setWindowWidth(window.innerWidth);
+    setWindowWidth(window.innerWidth); // update the window width when resized
   };
 
   useEffect(() => {
-    window.addEventListener('resize', handleResize);
+    window.addEventListener('resize', handleResize); // event listener for window resize
     return () => {
-      window.removeEventListener('resize', handleResize);
+      window.removeEventListener('resize', handleResize); 
     };
   }, []);
 
   useEffect(() => {
     if (windowWidth > 768) {
-      setSidebar(true); 
+      setSidebar(true); // sibar visible if width > 768px
     } else {
-      setSidebar(false); 
+      setSidebar(false); // hide sidebar if width < 768px
     }
   }, [windowWidth]);
 
@@ -38,14 +38,16 @@ function Sidebar() {
       <IconContext.Provider value={{ color: '#fff' }}>
         <div className='navbar'>
           {windowWidth <= 768 && ( 
+            // render the menu icon if the window width is <= 768px
             <Link to='#' className='menu-bars1'>
-              <MenuIcon onClick={showSidebar} />
+              <MenuIcon onClick={showSidebar} /> {/**show the sidebar when you click on menu */}
             </Link>
           )}
         </div>
 
         <nav className={sidebar ? 'nav-menu active' : 'nav-menu'}>
           {windowWidth <= 768 && ( 
+            // sidebar content rendering if window width <= 768px
             <ul className='nav-menu-items' onClick={showSidebar}>
               <li className='navbar-toggle' onClick={showSidebar}>
                 <Link to='#' className='menu-bars2'>
@@ -57,6 +59,7 @@ function Sidebar() {
               </li>
               {SidebarData.map((val, key) => {
                 return (
+                  // render sidebar links based on sidebarData array
                   <li key={key} className={val.cName}>
                     <Link to={val.link} className={val.link === activeLink ? 'active': ''}>
                       {val.icon}
@@ -68,6 +71,7 @@ function Sidebar() {
             </ul>
           )}
           {windowWidth > 768 && ( 
+            // render sidebar content only if window width > 768px
             <ul className='nav-menu-items'>
               {SidebarData.map((val, key) => {
                 return (

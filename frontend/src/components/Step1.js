@@ -4,7 +4,9 @@ import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 
+// set mapbox access token
 mapboxgl.accessToken = 'pk.eyJ1IjoiaGVkaS1tYWtobG91ZiIsImEiOiJjbGpjdDJwdXowM3Z2M2RzMnJzMW5id2N1In0.gH1XsrErXO_3cp7ZxirG2g';
+// right to left language support 
 mapboxgl.setRTLTextPlugin(
   'https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-rtl-text/v0.2.3/mapbox-gl-rtl-text.js',
   null,
@@ -16,7 +18,9 @@ const Step1 = ({ handleNext }) => {
   const [address, setAddress] = useState('');
   const [projectNameTouched, setProjectNameTouched] = useState(false);
   const [addressTouched, setAddressTouched] = useState(false);
+  const [defaultLocation, setDefaultLocation] = useState([2.3522 ,48.8566 ]);
 
+  // event handler for proj name and @ changes
   const handleProjectNameChange = (event) => {
     setProjectName(event.target.value);
   };
@@ -24,7 +28,7 @@ const Step1 = ({ handleNext }) => {
   const handleAddressChange = (event) => {
     setAddress(event.target.value);
   };
-
+  // event handler for proj name and @ blur
   const handleProjectNameBlur = () => {
     setProjectNameTouched(true);
   };
@@ -32,16 +36,19 @@ const Step1 = ({ handleNext }) => {
   const handleAddressBlur = () => {
     setAddressTouched(true);
   };
-
+  
+  // error for checking proj name and @
   const projectNameError = projectNameTouched && projectName === '';
   const addressError = addressTouched && address === '';
 
+  // State variables for coordinates, map container reference, map reference, and marker reference
   const [coordinates, setCoordinates] = useState([]);
   const mapContainerRef = useRef(null);
   const mapRef = useRef(null);
   const markerRef = useRef(null);
 
-  useEffect(() => {
+  useEffect(() => {    
+    // Function to geocode the address and get coordinates
     const geocodeAddress = async () => {
       if (address.trim() !== '') {
         const response = await fetch(
@@ -53,9 +60,11 @@ const Step1 = ({ handleNext }) => {
           const [lng, lat] = data.features[0].center;
           setCoordinates([lng, lat]);
         }
+      } else { // set to default location when adress field is empty
+        setCoordinates(defaultLocation);
       }
     };
-
+    // call the geocodeAdress function when the address changes
     geocodeAddress();
   }, [address]);
 
@@ -70,14 +79,15 @@ const Step1 = ({ handleNext }) => {
           center: [lng, lat],
           zoom: 12
         });
-
+        // click event listener to reverse geocode
         mapRef.current.on('click', (e) => {
           const { lngLat } = e;
           reverseGeocode(lngLat);
         });
-
+        // map marker
         markerRef.current = new mapboxgl.Marker().setLngLat([lng, lat]).addTo(mapRef.current);
       } else {
+        // fly to coords and update marker position
         mapRef.current.flyTo({
           center: [lng, lat],
           zoom: mapRef.current.getZoom()
@@ -87,7 +97,7 @@ const Step1 = ({ handleNext }) => {
       }
     }
   }, [coordinates]);
-
+  // reverse geocoding function ( coords to @ )
   const reverseGeocode = async (lngLat) => {
     const response = await fetch(
       `https://api.mapbox.com/geocoding/v5/mapbox.places/${lngLat.lng},${lngLat.lat}.json?access_token=${mapboxgl.accessToken}`
@@ -99,7 +109,7 @@ const Step1 = ({ handleNext }) => {
       setAddress(address);
     }
   };
-
+  // check next button diabled  
   const isNextButtonDisabled = projectName === '' || address === '';
 
   return (
