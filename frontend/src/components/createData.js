@@ -203,10 +203,10 @@ function EnhancedTableToolbar(props) {
       ) : (
         <Box sx={{ 
         display: 'flex'}} > 
-        <Link to="/createProject">
+        <Link to="/createProject" style={{ textDecoration: 'none'}}>
         <Button 
           style={{'background-color':'#1a83ff', 'color':'white',
-         'width': 139}} 
+         'width': 139 , textDecorationLine: 'none' , textDecoration:'none'}} 
           
           sx={{  
           marginRight: 2,

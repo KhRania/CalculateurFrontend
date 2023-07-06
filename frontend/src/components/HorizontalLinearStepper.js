@@ -5,8 +5,9 @@ import Step from '@mui/material/Step';
 import StepLabel from '@mui/material/StepLabel';
 import Typography from '@mui/material/Typography';
 import Step2 from './Step2';
-import Step1 from './Step1';
 import { Button } from '@mui/material';
+import CreateProject from './CreateProject';
+import Step3 from './Step3';
 
 // Array to hold the labels for each step
 const steps = ['', '', ''];
@@ -55,8 +56,9 @@ export default function HorizontalLinearStepper() {
         })}
       </Stepper>
       {/* show the contents of each step */}
-      {activeStep === 0 && <Step1 handleNext={handleNext} handleBack={handleBack} />}
+      {activeStep === 0 && <CreateProject handleNext={handleNext} handleBack={handleBack} />}
       {activeStep === 1 && <Step2 handleNext={handleNext} handleBack={handleBack} />}
+      {activeStep === 2 && <Step3 handleNext={handleNext} handleBack={handleBack} />}
       {activeStep === steps.length ? (
         <React.Fragment>
           <Typography sx={{ mt: 2, mb: 1 }}>

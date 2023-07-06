@@ -3,7 +3,7 @@ import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
 import { Button } from '@mui/material';
 
-export default function Step2({handleBack, handleNext}) {
+export default function Step3({handleBack}) {
   return (
     <div>
       <Box
@@ -15,26 +15,16 @@ export default function Step2({handleBack, handleNext}) {
       autoComplete="off"
     >
       <TextField id="outlined-basic" label="Outlined" variant="outlined" />
-      </Box>
-      <div style={{display:'flex'}}>
+    </Box>
       <div style={{ display: 'flex', justifyContent: 'flex-start', marginTop: '1rem' , marginRight: '1rem'}}>
         <Button
+          
           onClick={handleBack}
           style={{ backgroundColor: '#1a83ff', color: 'white' }}
         >
           Back
         </Button>
       </div>
-      <div style={{  display: 'flex', justifyContent: 'flex-start', marginTop: '1rem' , marginRight: '1rem'}}>
-        <Button
-          onClick={handleNext} 
-          style={{ backgroundColor: '#1a83ff', color: 'white'  }}
-        >
-          next
-        </Button>
-      </div>
-      </div>
-      
     </div>
     
   );

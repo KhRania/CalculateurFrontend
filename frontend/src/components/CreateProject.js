@@ -13,7 +13,7 @@ mapboxgl.setRTLTextPlugin(
   true 
 );
 
-const Step1 = ({ handleNext }) => {
+const CreateProject = ({ handleNext }) => {
   const [projectName, setProjectName] = useState('');
   const [address, setAddress] = useState('');
   const [projectNameTouched, setProjectNameTouched] = useState(false);
@@ -119,7 +119,7 @@ const Step1 = ({ handleNext }) => {
           component="form"
           sx={{
             '& .MuiTextField-root': { m: 2, width: '30ch' },
-            marginRight: '1rem'
+            marginRight: '1rem' , marginTop: '1rem' , overflow: 'auto'
           }}
           noValidate
           autoComplete="off"
@@ -152,22 +152,24 @@ const Step1 = ({ handleNext }) => {
           <div>
             <TextField id="outlined-multiline-flexible" label="Description" multiline maxRows={8} />
           </div>
-        </Box>
-        <div style={{ flex: 1 , marginTop: '1rem' ,marginRight:'1rem'}}>
-          <div id="map" style={{ height: '35rem' }} ref={mapContainerRef}></div>
-        </div>
-      </div>
-      <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '6rem' , marginRight: '1rem'}}>
+          <div style={{ textDecoration: 'none' , justifyContent: 'flex-end', marginTop: '1rem' , marginLeft: '1rem'}}>
         <Button
           disabled={isNextButtonDisabled}
           onClick={handleNext}
-          style={{ backgroundColor: isNextButtonDisabled ? 'gray' : '#1a83ff', color: 'white' }}
+          
+          style={{ backgroundColor: isNextButtonDisabled ? 'gray' : '#1a83ff', color: 'white' , width: '33ch' }}
         >
-          Next
+          create
         </Button>
       </div>
+        </Box>
+        <div style={{ flex: 1 , marginTop: '2rem' ,marginRight:'2rem'}}>
+          <div id="map" style={{ height: '39rem' , width:'100%' , marginBottom: '1rem' }} ref={mapContainerRef}></div>
+        </div>
+      </div>
+      
     </div>
   );
 };
 
-export default Step1;
+export default CreateProject;

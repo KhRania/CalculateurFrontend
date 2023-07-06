@@ -3,6 +3,7 @@ import Sidebar from './Sidebar';
 import { Paper } from '@mui/material';
 import HorizontalLinearStepper from './HorizontalLinearStepper';
 import '../css/ProjectCreation.css';
+
 function ProjectCreation() {
   return (
     <>
