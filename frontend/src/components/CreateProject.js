@@ -109,7 +109,7 @@ const CreateProject = ({ handleNext }) => {
       setAddress(address);
     }
   };
-  // check next button diabled  
+  // check next button disabled  
   const isNextButtonDisabled = projectName === '' || address === '';
 
   return (
