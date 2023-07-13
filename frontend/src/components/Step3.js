@@ -3,9 +3,11 @@ import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
 import { Button , Typography} from '@mui/material';
 import MenuItem from '@mui/material/MenuItem';
-import { MapContainer, TileLayer, GeoJSON, Polygon, Popup } from 'react-leaflet';
+import { MapContainer, TileLayer, GeoJSON, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import { Dialog, DialogTitle, DialogContent, FormControlLabel, RadioGroup, Radio } from '@mui/material';
+import regionsData from './regions.json';
+
 
 const windSpeed = [
   {
@@ -69,6 +71,7 @@ const terrainChoices = [
 ];
 
 
+
 export default function Step3({ handleBack , handleNext}) {
   const [windSpeedData, setWindSpeedData] = useState([]);
   const [elevationData, setElevationData] = useState([]);
@@ -77,46 +80,48 @@ export default function Step3({ handleBack , handleNext}) {
   const [selectedOrography, setSelectedOrography] = useState('');
   const [isOrographySelected, setIsOrographySelected] = useState(false);
   const [selectedTerrain, setSelectedTerrain] = useState('');
+  const [selectedFeature, setSelectedFeature] = useState(null);
+  const [isMapClicked, setIsMapClicked] = useState(false);
 
-  const franceWindSpeedData = [
-    // Array containing wind speed data for different regions in France
-    // Format: [regionName, windSpeedValue, polygonPositions]
-    ['Region 1', 10, [[48, -4], [42, 9], [51, 8], [48, -4]]],
-    ['Region 2', 20, [[45, -3], [41, 7], [49, 7], [45, -3]]],
-    // Add more regions and wind speed values
-  ];
-  const franceElevationData = [
-    // Array containing elevation data for different regions in France
-    // Format: [regionName, elevationValue, polygonPositions]
-    ['Region 1', 100, [[48, -4], [42, 9], [51, 8], [48, -4]]],
-    ['Region 2', 200, [[45, -3], [41, 7], [49, 7], [45, -3]]],
-    // Add more regions and elevation values
-  ];
-  const franceSnowLoadData = [
-    // Array containing snow load data for different zones in France
-    // Format: [zoneName, snowLoadValue, polygonPositions]
-    ['Zone 1', '10 kN/m²', [[48, -4], [42, 9], [51, 8], [48, -4]]],
-    ['Zone 2A', '15 kN/m²', [[45, -3], [41, 7], [49, 7], [45, -3]]],
-    // Add more zones and snow load values
-  ];
+
+  
+  
+  const onEachFeature = (feature, layer) => {
+    layer.on({
+      click: () => {
+        setSelectedFeature(feature);
+        setIsMapClicked(true);
+      },
+    });
+  };
 
   const handleWindSpeedClick = () => {
-    setWindSpeedData(franceWindSpeedData);
+    setWindSpeedData(regionsData.features);
     setElevationData([]);
     setSnowLoadData([]);
+    const ileDeFrance = regionsData.features.find((feature) => feature.properties.code === '11');
+    const bretagne = regionsData.features.find((feature) => feature.properties.code === '53');
+    setSelectedFeature([ileDeFrance, bretagne]);
   };
-
+  
   const handleElevationClick = () => {
     setWindSpeedData([]);
-    setElevationData(franceElevationData);
+    setElevationData(regionsData.features);
     setSnowLoadData([]);
+    const ileDeFrance = regionsData.features.find((feature) => feature.properties.code === '11');
+    const bretagne = regionsData.features.find((feature) => feature.properties.code === '53');
+    setSelectedFeature([ileDeFrance, bretagne]);
   };
-
+  
   const handleSnowLoadClick = () => {
     setWindSpeedData([]);
     setElevationData([]);
-    setSnowLoadData(franceSnowLoadData);
+    setSnowLoadData(regionsData.features);
+    const ileDeFrance = regionsData.features.find((feature) => feature.properties.code === '11');
+    const bretagne = regionsData.features.find((feature) => feature.properties.code === '53');
+    setSelectedFeature([ileDeFrance, bretagne]);
   };
+  
 
   const handlePopupOpen = () => {
     setOpenPopup(true);
@@ -240,65 +245,64 @@ export default function Step3({ handleBack , handleNext}) {
           {/** the leaflet map to visualize information */}
           <div style={{ display: 'flex', justifyContent: 'center' }}>
             <div style={{ flex: 1 }}>
-              <MapContainer center={[46.603354, 1.888334]} zoomControl={false} zoom={6} style={{ height: '35rem' }}>
+              <MapContainer center={[46.603354, 1.888334]} 
+              zoomControl={false} 
+              zoom={6} 
+              style={{ height: '35rem' }} 
+              onClick={() => setIsMapClicked(false)}>
+                
                 <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
 
-                {windSpeedData.map(([regionName, windSpeed, polygonPositions], index) => (
-                  <Polygon
-                    key={index}
-                    positions={polygonPositions}
-                    eventHandlers={{
-                      click: (e) => {
-                        e.target.openPopup();
-                      },
-                    }}
-                  >
+                <GeoJSON
+                   data={regionsData}
+                   style={(feature) => {
+                    const isSelected = selectedFeature && Array.isArray(selectedFeature) && selectedFeature.some((selected) => selected.properties.code === feature.properties.code);
+                    const isIleDeFrance = feature.properties.code === '11';
+                    const isBretagne = feature.properties.code === '53';
+                  
+                    if (isSelected || isMapClicked) {
+                      if (isIleDeFrance && windSpeedData.length > 0) {
+                        return { fillColor: 'red' };
+                      } else if (isBretagne && windSpeedData.length > 0) {
+                        return { fillColor: 'green' };
+                      } else if (isIleDeFrance && elevationData.length > 0) {
+                        return { fillColor: 'blue' };
+                      } else if (isBretagne && elevationData.length > 0) {
+                        return { fillColor: 'yellow' };
+                      } else if (isIleDeFrance && snowLoadData.length > 0) {
+                        return { fillColor: 'purple' };
+                      } else if (isBretagne && snowLoadData.length > 0) {
+                        return { fillColor: 'orange' };
+                      }
+                    }
+                  
+                    return { fillColor: 'transparent' };
+                  }}
+                  
+                   onEachFeature={onEachFeature}
+                 >
+                 {/** {selectedFeature && Array.isArray(selectedFeature) && (
                     <Popup>
-                      <div>
-                        <h3>{regionName}</h3>
-                        <p>Wind Speed: {windSpeed}</p>
-                      </div>
+                      {selectedFeature.map((feature) => (
+                        <div key={feature.properties.code}>
+                          <h3>{feature.properties.nom}</h3>
+                          {windSpeedData.length > 0 && (
+                            <p>Wind Speed: {feature.properties.windSpeed}</p>
+                          )}
+                          {elevationData.length > 0 && (
+                            <p>Elevation: {feature.properties.elevation}</p>
+                          )}
+                          {snowLoadData.length > 0 && (
+                            <p>Snow Load: {feature.properties.snowLoad}</p>
+                          )}
+                        </div>
+                      ))}
                     </Popup>
-                  </Polygon>
-                ))}
+                  )} */}
 
-                {elevationData.map(([regionName, elevation, polygonPositions], index) => (
-                  <Polygon
-                    key={index}
-                    positions={polygonPositions}
-                    eventHandlers={{
-                      click: (e) => {
-                        e.target.openPopup();
-                      },
-                    }}
-                  >
-                    <Popup>
-                      <div>
-                        <h3>{regionName}</h3>
-                        <p>Elevation: {elevation}</p>
-                      </div>
-                    </Popup>
-                  </Polygon>
-                ))}
+                </GeoJSON>
 
-                {snowLoadData.map(([zoneName, snowLoadValue, polygonPositions], index) => (
-                  <Polygon
-                    key={index}
-                    positions={polygonPositions}
-                    eventHandlers={{
-                      click: (e) => {
-                        e.target.openPopup();
-                      },
-                    }}
-                  >
-                    <Popup>
-                      <div>
-                        <h3>{zoneName}</h3>
-                        <p>Snow Load: {snowLoadValue}</p>
-                      </div>
-                    </Popup>
-                  </Polygon>
-                ))}
+
               </MapContainer>
             </div>
           </div>
