@@ -7,6 +7,9 @@ import { MapContainer, TileLayer, GeoJSON, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import { Dialog, DialogTitle, DialogContent, FormControlLabel, RadioGroup, Radio } from '@mui/material';
 import regionsData from './regions.json';
+import WindSpeedLegend from './WindSpeedLegend';
+import ElevationLegend from './ElevationLegend';
+import SnowLoadLegend from './SnowLoadLegend';
 
 
 const windSpeed = [
@@ -82,10 +85,10 @@ export default function Step3({ handleBack , handleNext}) {
   const [selectedTerrain, setSelectedTerrain] = useState('');
   const [selectedFeature, setSelectedFeature] = useState(null);
   const [isMapClicked, setIsMapClicked] = useState(false);
+  const [showWindSpeedLegend, setShowWindSpeedLegend] = useState(false);
+  const [showElevationLegend, setShowElevationLegend] = useState(false);
+  const [showSnowLoadLegend, setShowSnowLoadLegend] = useState(false);
 
-
-  
-  
   const onEachFeature = (feature, layer) => {
     layer.on({
       click: () => {
@@ -101,7 +104,22 @@ export default function Step3({ handleBack , handleNext}) {
     setSnowLoadData([]);
     const ileDeFrance = regionsData.features.find((feature) => feature.properties.code === '11');
     const bretagne = regionsData.features.find((feature) => feature.properties.code === '53');
-    setSelectedFeature([ileDeFrance, bretagne]);
+    const normandie = regionsData.features.find((feature) => feature.properties.code === '28');
+    const hautsDeFrance = regionsData.features.find((feature) => feature.properties.code === '32');
+    const grandEst = regionsData.features.find((feature) => feature.properties.code === '44');
+    const bourgogneFranceComte = regionsData.features.find((feature) => feature.properties.code === '27');
+    const centrevalDeLoire = regionsData.features.find((feature) => feature.properties.code === '24');
+    const paysDeLaLoire = regionsData.features.find((feature) => feature.properties.code === '52');
+    const nouvelleAquitaine = regionsData.features.find((feature) => feature.properties.code === '75');
+    const auvergneRhoneAlpes = regionsData.features.find((feature) => feature.properties.code === '84');
+    const occitanie = regionsData.features.find((feature) => feature.properties.code === '76');
+    const provenceAplesCote = regionsData.features.find((feature) => feature.properties.code === '93');
+    const corse = regionsData.features.find((feature) => feature.properties.code === '94');
+
+    setSelectedFeature([ileDeFrance, bretagne , normandie, hautsDeFrance , grandEst , bourgogneFranceComte , centrevalDeLoire, paysDeLaLoire, nouvelleAquitaine, auvergneRhoneAlpes,occitanie,provenceAplesCote, corse]);
+    setShowWindSpeedLegend(true);
+    setShowElevationLegend(false);
+    setShowSnowLoadLegend(false);
   };
   
   const handleElevationClick = () => {
@@ -110,7 +128,22 @@ export default function Step3({ handleBack , handleNext}) {
     setSnowLoadData([]);
     const ileDeFrance = regionsData.features.find((feature) => feature.properties.code === '11');
     const bretagne = regionsData.features.find((feature) => feature.properties.code === '53');
-    setSelectedFeature([ileDeFrance, bretagne]);
+    const normandie = regionsData.features.find((feature) => feature.properties.code === '28');
+    const hautsDeFrance = regionsData.features.find((feature) => feature.properties.code === '32');
+    const grandEst = regionsData.features.find((feature) => feature.properties.code === '44');
+    const bourgogneFranceComte = regionsData.features.find((feature) => feature.properties.code === '27');
+    const centrevalDeLoire = regionsData.features.find((feature) => feature.properties.code === '24');
+    const paysDeLaLoire = regionsData.features.find((feature) => feature.properties.code === '52');
+    const nouvelleAquitaine = regionsData.features.find((feature) => feature.properties.code === '75');
+    const auvergneRhoneAlpes = regionsData.features.find((feature) => feature.properties.code === '84');
+    const occitanie = regionsData.features.find((feature) => feature.properties.code === '76');
+    const provenceAplesCote = regionsData.features.find((feature) => feature.properties.code === '93');
+    const corse = regionsData.features.find((feature) => feature.properties.code === '94');
+
+    setSelectedFeature([ileDeFrance, bretagne , normandie, hautsDeFrance , grandEst , bourgogneFranceComte , centrevalDeLoire, paysDeLaLoire, nouvelleAquitaine, auvergneRhoneAlpes,occitanie,provenceAplesCote, corse]);    
+    setShowWindSpeedLegend(false);
+    setShowElevationLegend(true);
+    setShowSnowLoadLegend(false);
   };
   
   const handleSnowLoadClick = () => {
@@ -119,7 +152,22 @@ export default function Step3({ handleBack , handleNext}) {
     setSnowLoadData(regionsData.features);
     const ileDeFrance = regionsData.features.find((feature) => feature.properties.code === '11');
     const bretagne = regionsData.features.find((feature) => feature.properties.code === '53');
-    setSelectedFeature([ileDeFrance, bretagne]);
+    const normandie = regionsData.features.find((feature) => feature.properties.code === '28');
+    const hautsDeFrance = regionsData.features.find((feature) => feature.properties.code === '32');
+    const grandEst = regionsData.features.find((feature) => feature.properties.code === '44');
+    const bourgogneFranceComte = regionsData.features.find((feature) => feature.properties.code === '27');
+    const centrevalDeLoire = regionsData.features.find((feature) => feature.properties.code === '24');
+    const paysDeLaLoire = regionsData.features.find((feature) => feature.properties.code === '52');
+    const nouvelleAquitaine = regionsData.features.find((feature) => feature.properties.code === '75');
+    const auvergneRhoneAlpes = regionsData.features.find((feature) => feature.properties.code === '84');
+    const occitanie = regionsData.features.find((feature) => feature.properties.code === '76');
+    const provenceAplesCote = regionsData.features.find((feature) => feature.properties.code === '93');
+    const corse = regionsData.features.find((feature) => feature.properties.code === '94');
+
+    setSelectedFeature([ileDeFrance, bretagne , normandie, hautsDeFrance , grandEst , bourgogneFranceComte , centrevalDeLoire, paysDeLaLoire, nouvelleAquitaine, auvergneRhoneAlpes,occitanie,provenceAplesCote, corse]);    
+    setShowWindSpeedLegend(false);
+    setShowElevationLegend(false);
+    setShowSnowLoadLegend(true);
   };
   
 
@@ -142,7 +190,15 @@ export default function Step3({ handleBack , handleNext}) {
     setSelectedTerrain(choiceValue);
   };
   
-  
+  const legendsContainerStyle = {
+    position: 'absolute',
+    bottom: '1rem',
+    left: '1rem',
+    zIndex: 1000, // Ensure the legends appear above the map layers
+    backgroundColor: 'rgba(255, 255, 255)', // White background with transparency
+    padding: '1rem',
+  };
+
   return (
     <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '1rem' }}>
       <div style={{ flex: '1', marginRight: '1rem' }}>
@@ -242,6 +298,8 @@ export default function Step3({ handleBack , handleNext}) {
             </Button>
           </div>
 
+          
+
           {/** the leaflet map to visualize information */}
           <div style={{ display: 'flex', justifyContent: 'center' }}>
             <div style={{ flex: 1 }}>
@@ -253,34 +311,118 @@ export default function Step3({ handleBack , handleNext}) {
                 
                 <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
 
+                {/* Legends container */}
+                <div className="legends-container" style={legendsContainerStyle}>
+                  {showWindSpeedLegend && <WindSpeedLegend />}
+                  {showElevationLegend && <ElevationLegend />}
+                  {showSnowLoadLegend && <SnowLoadLegend />}
+                </div>
+
                 <GeoJSON
-                   data={regionsData}
-                   style={(feature) => {
+                  data={regionsData}
+                  style={(feature) => {
                     const isSelected = selectedFeature && Array.isArray(selectedFeature) && selectedFeature.some((selected) => selected.properties.code === feature.properties.code);
                     const isIleDeFrance = feature.properties.code === '11';
                     const isBretagne = feature.properties.code === '53';
-                  
+                    const isNormandie = feature.properties.code === '28'; 
+                    const isHautsDeFrance = feature.properties.code === '32' ; 
+                    const isGrandEst = feature.properties.code === '44' ; 
+                    const isBourgogneFranceComte = feature.properties.code === '27' ;
+                    const isCentrevalDeLoire = feature.properties.code === '24';
+                    const isPaysDeLaLoire = feature.properties.code === '52';
+                    const isNouvelleAquitaine = feature.properties.code === '75';
+                    const isAuvergneRhoneAlpes = feature.properties.code === '84';
+                    const isOccitanie = feature.properties.code === '76';
+                    const isProvenceAplesCote = feature.properties.code === '93';
+                    const isCorse = feature.properties.code === '94' ;
+
                     if (isSelected || isMapClicked) {
                       if (isIleDeFrance && windSpeedData.length > 0) {
-                        return { fillColor: 'red' };
+                        return { fillColor: '#4cffc4', color: '#000000', weight: 0.5 };
                       } else if (isBretagne && windSpeedData.length > 0) {
-                        return { fillColor: 'green' };
+                        return { fillColor: '#c3ff4c', color: '#000000', weight: 0.5 }; // 26
+                      } else if (isNormandie && windSpeedData.length > 0) {
+                        return { fillColor: '#4cffc4', color: '#000000', weight: 0.5 };
+                      } else if (isAuvergneRhoneAlpes && windSpeedData.length > 0) {
+                        return { fillColor: '#4c4cff', color: '#000000', weight: 0.5 }; //22
+                      } else if (isBourgogneFranceComte && windSpeedData.length > 0) {
+                        return { fillColor: '#4cffc4', color: '#000000', weight: 0.5 };
+                      } else if (isCentrevalDeLoire && windSpeedData.length > 0) {
+                        return { fillColor: '#4cffc4', color: '#000000', weight: 0.5 };
+                      } else if (isCorse && windSpeedData.length > 0) {
+                        return { fillColor: '#880808', color: '#000000', weight: 0.5 }; // 28
+                      } else if (isGrandEst && windSpeedData.length > 0) {
+                        return { fillColor: '#4cffc4', color: '#000000' , weight: 0.5};
+                      } else if (isHautsDeFrance && windSpeedData.length > 0) {
+                        return { fillColor: '#c3ff4c', color: '#000000' , weight: 0.5}; // 26
+                      } else if (isNouvelleAquitaine && windSpeedData.length > 0) {
+                        return { fillColor: '#4c4cff', color: '#000000', weight: 0.5 }; // 22
+                      } else if (isOccitanie && windSpeedData.length > 0) {
+                        return { fillColor: '#4cffc4', color: '#000000' , weight: 0.5};
+                      } else if (isPaysDeLaLoire && windSpeedData.length > 0) {
+                        return { fillColor: '#4cffc4', color: '#000000', weight: 0.5 };
+                      } else if (isProvenceAplesCote && windSpeedData.length > 0) {
+                        return { fillColor: '#4cffc4', color: '#000000', weight: 0.5 };
+
                       } else if (isIleDeFrance && elevationData.length > 0) {
-                        return { fillColor: 'blue' };
+                        return { fillColor: '#008000', color: '#000000' , weight: 0.5};
                       } else if (isBretagne && elevationData.length > 0) {
-                        return { fillColor: 'yellow' };
+                        return { fillColor: '#008000', color: '#000000', weight: 0.5 };
+                      } else if (isNormandie && elevationData.length > 0) {
+                        return { fillColor: '#008000', color: '#000000', weight: 0.5 };
+                      } else if (isAuvergneRhoneAlpes && elevationData.length > 0) {
+                        return { fillColor: '#A0522D', color: '#000000' , weight: 0.5};//
+                      } else if (isBourgogneFranceComte && elevationData.length > 0) {
+                        return { fillColor: '#DAA520', color: '#000000' , weight: 0.5};//
+                      } else if (isCentrevalDeLoire && elevationData.length > 0) {
+                        return { fillColor: '#008000', color: '#000000', weight: 0.5 };
+                      } else if (isCorse && elevationData.length > 0) {
+                        return { fillColor: '#DAA520', color: '#000000', weight: 0.5 }; //
+                      } else if (isGrandEst && elevationData.length > 0) {
+                        return { fillColor: '#008000', color: '#000000', weight: 0.5 };
+                      } else if (isHautsDeFrance && elevationData.length > 0) {
+                        return { fillColor: '#008000', color: '#000000' , weight: 0.5};
+                      } else if (isNouvelleAquitaine && elevationData.length > 0) {
+                        return { fillColor: '#008000', color: '#000000', weight: 0.5 };
+                      } else if (isOccitanie && elevationData.length > 0) {
+                        return { fillColor: '#DAA520', color: '#000000' , weight: 0.5};//
+                      } else if (isPaysDeLaLoire && elevationData.length > 0) {
+                        return { fillColor: '#008000', color: '#000000', weight: 0.5 };
+                      } else if (isProvenceAplesCote && elevationData.length > 0) {
+                        return { fillColor: '#A0522D', color: '#000000', weight: 0.5 };//
+
                       } else if (isIleDeFrance && snowLoadData.length > 0) {
-                        return { fillColor: 'purple' };
+                        return { fillColor: '#4c4cff', color: '#000000' , weight: 0.5}; //a1
                       } else if (isBretagne && snowLoadData.length > 0) {
-                        return { fillColor: 'orange' };
-                      }
-                    }
-                  
-                    return { fillColor: 'transparent' };
+                        return { fillColor: '#4c4cff', color: '#000000' , weight: 0.5};//a1
+                      } else if (isNormandie && snowLoadData.length > 0) {
+                        return { fillColor: '#4c4cff', color: '#000000', weight: 0.5 };//a1
+                      } else if (isAuvergneRhoneAlpes && snowLoadData.length > 0) {
+                        return { fillColor: '#ff4c4c', color: '#000000', weight: 0.5 };//c
+                      } else if (isBourgogneFranceComte && snowLoadData.length > 0) {
+                        return { fillColor: '#c3ff4c', color: '#000000', weight: 0.5 };//b
+                      } else if (isCentrevalDeLoire && snowLoadData.length > 0) {
+                        return { fillColor: '#4c4cff', color: '#000000' , weight: 0.5}; //a1
+                      } else if (isCorse && snowLoadData.length > 0) {
+                        return { fillColor: '#4cffc4', color: '#000000', weight: 0.5 };//a2
+                      } else if (isGrandEst && snowLoadData.length > 0) {
+                        return { fillColor: '#4c4cff', color: '#000000', weight: 0.5 };//a1
+                      } else if (isHautsDeFrance && snowLoadData.length > 0) {
+                        return { fillColor: '#4c4cff', color: '#000000', weight: 0.5 }; //a1
+                      } else if (isNouvelleAquitaine && snowLoadData.length > 0) {
+                        return { fillColor: '#4cffc4', color: '#000000' , weight: 0.5};//a2
+                      } else if (isOccitanie && snowLoadData.length > 0) {
+                        return { fillColor: '#c3ff4c', color: '#000000' , weight: 0.5};//b
+                      } else if (isPaysDeLaLoire && snowLoadData.length > 0) {
+                        return { fillColor: '#4c4cff', color: '#000000', weight: 0.5 }; //a1
+                      } else if (isProvenceAplesCote && snowLoadData.length > 0) {
+                        return { fillColor: '#ff4c4c', color: '#000000', weight: 0.5 };//c
+                    }}
+
+                    return { fillColor: 'transparent', color: '#000000', weight: 0.5 };
                   }}
-                  
-                   onEachFeature={onEachFeature}
-                 >
+                  onEachFeature={onEachFeature}
+                >
                  {/** {selectedFeature && Array.isArray(selectedFeature) && (
                     <Popup>
                       {selectedFeature.map((feature) => (
