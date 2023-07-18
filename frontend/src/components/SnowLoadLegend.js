@@ -5,19 +5,19 @@ const SnowLoadLegend = () => {
         <div>
           <div>
             <div style={{ display: 'flex', alignItems: 'center' }}>
-              <div style={{ width: '20px', height: '20px', backgroundColor: '#4c4cff', marginRight: '5px' }}></div>
+              <div style={{ width: '20px', height: '20px', backgroundColor: '#bcc0df', marginRight: '5px' }}></div>
               <span>Zone A1</span>
             </div>
             <div style={{ display: 'flex', alignItems: 'center' }}>
-              <div style={{ width: '20px', height: '20px', backgroundColor: '#4cffc4', marginRight: '5px' }}></div>
+              <div style={{ width: '20px', height: '20px', backgroundColor: '#d0f4d4', marginRight: '5px' }}></div>
               <span>Zone A2</span>
             </div>
             <div style={{ display: 'flex', alignItems: 'center' }}>
-              <div style={{ width: '20px', height: '20px', backgroundColor: '#c3ff4c', marginRight: '5px' }}></div>
+              <div style={{ width: '20px', height: '20px', backgroundColor: '#e8f4bc', marginRight: '5px' }}></div>
               <span>Zone B</span>
             </div>
             <div style={{ display: 'flex', alignItems: 'center' }}>
-              <div style={{ width: '20px', height: '20px', backgroundColor: '#ff4c4c', marginRight: '5px' }}></div>
+              <div style={{ width: '20px', height: '20px', backgroundColor: '#ddc1bc', marginRight: '5px' }}></div>
               <span>Zone C</span>
             </div>
           </div>

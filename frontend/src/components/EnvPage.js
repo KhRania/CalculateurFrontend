@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
-import { Button , Typography} from '@mui/material';
+import { Button , FormControl, InputLabel, Select, Typography} from '@mui/material';
 import MenuItem from '@mui/material/MenuItem';
 import { MapContainer, TileLayer, GeoJSON, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -10,6 +10,13 @@ import regionsData from './regions.json';
 import WindSpeedLegend from './WindSpeedLegend';
 import ElevationLegend from './ElevationLegend';
 import SnowLoadLegend from './SnowLoadLegend';
+import rugged from '../assets/rugged_terrain.png';
+import smooth from '../assets/smooth_terrain.png';
+import terrain0 from '../assets/terrain0.png' ;
+import terrain2 from '../assets/terrain2.png' ;
+import terrain3a from '../assets/terrain3a.png' ;
+import terrain3b from '../assets/terrain3b.png' ;
+import terrain4 from '../assets/terrain4.png' ;
 
 
 const windSpeed = [
@@ -33,8 +40,12 @@ const windSpeed = [
 
 const snowLoadZones = [
   {
-    value: 'Zone A',
-    label: 'Zone A',
+    value: 'Zone A1',
+    label: 'Zone A1',
+  },
+  {
+    value: 'Zone A2',
+    label: 'Zone A2',
   },
   {
     value: 'Zone B',
@@ -44,32 +55,53 @@ const snowLoadZones = [
     value: 'Zone C',
     label: 'Zone C',
   },
-  {
-    value: 'Zone D',
-    label: 'Zone D',
-  },
 ];
+
+const elevation = [
+  {
+   value: '0 m to 500 m',
+   label: '0 m to 500 m',
+  },
+  {
+    value: '500 m to 2000 m',
+    label: '500 m to 2000 m',
+  },
+  {
+    value: '2000 m +',
+    label: '2000 m +',
+  },
+]
 
 const terrainChoices = [
   {
     value: '0',
-    label: 'Terrain 0',
+    labelBold: 'Terrain category 0 :' ,
+    labelRegular: ' Sea or coastal area exposed to sea winds; lakes with a fetch of at least 5 km',
+    image: terrain0,
   },
   {
     value: '1',
-    label: 'Terrain 1',
+    labelBold: 'Terrain category 2 :', 
+    labelRegular: ' Open country, with or without a few isolated obstacles (trees, buildings, etc.) separated from each other by more than 40 times their height',
+    image: terrain2 ,
   },
   {
     value: '2',
-    label: 'Terrain 2',
+    labelBold: 'Terrain category 3a :',
+    labelRegular: ' Countryside with hedges; vineyards; grove; scattered habitat' ,
+    image: terrain3a ,
   },
   {
     value: '3',
-    label: 'Terrain 3',
+    labelBold: 'Terrain category 3b :',
+    labelRegular: ' Urbanized or industrial areas; dense grove; orchards',
+    image: terrain3b ,
   },
   {
     value: '4',
-    label: 'Terrain 4',
+    labelBold: 'Terrain category 4 :',
+    labelRegular: ' Urban areas where at least 15% of the surface is covered by buildings with an average height of more than 15 m; forests',
+    image: terrain4 ,
   },
 ];
 
@@ -88,6 +120,27 @@ export default function Step3({ handleBack , handleNext}) {
   const [showWindSpeedLegend, setShowWindSpeedLegend] = useState(false);
   const [showElevationLegend, setShowElevationLegend] = useState(false);
   const [showSnowLoadLegend, setShowSnowLoadLegend] = useState(false);
+
+  const [windSpeedValue, setWindSpeedValue] = useState('');
+  const [snowLoadValue, setSnowLoadValue] = useState('');
+  const [elevationValue, setElevationValue] = useState('');
+  const [isFormValid, setIsFormValid] = useState(false);
+
+  const validateForm = () => {
+    const isFormFilled =
+      windSpeedValue.trim() !== '' &&
+      snowLoadValue.trim() !== '' &&
+      elevationValue.trim() !== '' &&
+      selectedTerrain !== '' &&
+      selectedOrography !== '';
+
+    setIsFormValid(isFormFilled);
+  };
+
+  React.useEffect(() => {
+    validateForm();
+  }, [windSpeedValue, snowLoadValue, elevationValue, selectedTerrain, selectedOrography]);
+
 
   const onEachFeature = (feature, layer) => {
     layer.on({
@@ -210,39 +263,61 @@ export default function Step3({ handleBack , handleNext}) {
           noValidate
           autoComplete="off"
         >
-          <TextField
-            id="outlined-select-currency"
-            select
-            label="Wind Speed"
-            defaultValue=""
-          >
-            {windSpeed.map((option) => (
-              <MenuItem key={option.value} value={option.value}>
-                {option.label}
-              </MenuItem>
-            ))}
-          </TextField>
+            {/* Wind Speed */}
+            <FormControl fullWidth variant="outlined">
+            <InputLabel id="wind-speed-label">Wind Speed</InputLabel>
+            <Select
+              labelId="wind-speed-label"
+              id="wind-speed-select"
+              label="Wind Speed"
+              value={windSpeedValue}
+              onChange={(e) => setWindSpeedValue(e.target.value)}
+            >
+              {windSpeed.map((option) => (
+                <MenuItem key={option.value} value={option.value}>
+                  {option.label}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
 
-          <TextField
-            id="outlined-select-currency"
-            select
-            label="Snow Load Zone"
-            defaultValue=""
-          >
-            {snowLoadZones.map((option) => (
-              <MenuItem key={option.value} value={option.value}>
-                {option.label}
-              </MenuItem>
-            ))}
-          </TextField>
+          {/* Snow Load Zone */}
+          <FormControl fullWidth variant="outlined">
+            <InputLabel id="snow-load-label">Snow Load Zone</InputLabel>
+            <Select
+              labelId="snow-load-label"
+              id="snow-load-select"
+              label="Snow Load Zone"
+              value={snowLoadValue}
+              onChange={(e) => setSnowLoadValue(e.target.value)}
+            >
+              {snowLoadZones.map((option) => (
+                <MenuItem key={option.value} value={option.value}>
+                  {option.label}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
 
-          <TextField
-            id="outlined-basic"
-            label="Elevation"
-            defaultValue=""
-          >
-          </TextField>
+           {/* Elevation */}
+           <FormControl fullWidth variant="outlined">
+            <InputLabel id="elevation-label">Elevation</InputLabel>
+            <Select
+              labelId="elevation-label"
+              id="elevation-select"
+              label="Elevation"
+              value={elevationValue}
+              onChange={(e) => setElevationValue(e.target.value)}
+            >
+              {elevation.map((option) => (
+                <MenuItem key={option.value} value={option.value}>
+                  {option.label}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
 
+          {/** Orography */}
           <TextField
             id="outlined-basic"
             label="Orography factor"
@@ -262,26 +337,31 @@ export default function Step3({ handleBack , handleNext}) {
               key={choice.value}
               value={choice.value}
               control={<Radio />}
-              label={choice.label}
+              label={
+                <div style={{ display: 'flex', alignItems: 'center' }}>
+              <img
+                src={choice.image}
+                alt={`terrain${choice.value}`}
+                style={{ marginRight: '1rem', height: '5rem', width: '5rem' , marginTop:'0.5rem'}}
+              />
+              <div style={{ maxWidth: '25rem', wordWrap: 'break-word', whiteSpace: 'pre-wrap' , width:'25rem' }}>
+                <span style={{ fontWeight: 'bold' }}>{choice.labelBold}</span>
+                {choice.labelRegular}
+              </div>
+            </div>
+              }
             />
             ))}
           </RadioGroup>
         </Box>
-
-        <div style={{ display: 'flex', justifyContent: 'flex-start', marginTop: '1rem' }}>
-          <Button onClick={handleBack} style={{ backgroundColor: '#1a83ff', color: 'white' }}>
-            Back
-          </Button>
+        
+        <div style={{display: 'flex' , marginTop: '1rem'}}>
+            <Button onClick={handleBack} style={{ backgroundColor: '#1a83ff', color: 'white' , marginLeft:'1rem'}}>
+              Back
+            </Button>
         </div>
-
-        <div style={{  display: 'flex', justifyContent: 'flex-start', marginTop: '1rem' }}>
-        <Button
-          onClick={handleNext} style={{ backgroundColor: '#1a83ff', color: 'white'  }}>
-          next
-        </Button>
       </div>
       
-      </div>
       <div style={{ flex: '1', marginRight: '2rem' }}>
         <div>
 
@@ -301,7 +381,7 @@ export default function Step3({ handleBack , handleNext}) {
           
 
           {/** the leaflet map to visualize information */}
-          <div style={{ display: 'flex', justifyContent: 'center' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between' ,flexDirection: 'column', height:'100%'}}>
             <div style={{ flex: 1 }}>
               <MapContainer center={[46.603354, 1.888334]} 
               zoomControl={false} 
@@ -317,7 +397,8 @@ export default function Step3({ handleBack , handleNext}) {
                   {showElevationLegend && <ElevationLegend />}
                   {showSnowLoadLegend && <SnowLoadLegend />}
                 </div>
-
+                
+                {/** assign unique code and colors to each region */}
                 <GeoJSON
                   data={regionsData}
                   style={(feature) => {
@@ -447,25 +528,75 @@ export default function Step3({ handleBack , handleNext}) {
 
               </MapContainer>
             </div>
+            <div style={{display: 'flex' , justifyContent: 'flex-end',marginTop: '2.2rem', margineLeft: '50rem'}}>
+              <Button
+                onClick={handleNext} style={{ backgroundColor: !isFormValid ? 'gray' : '#1a83ff', color: 'white'  }} disabled={!isFormValid}>
+                next
+              </Button>
+            </div>
           </div>
         </div>
       </div>
 
       {/** orography value using popup dialog and radio groups  */}
-      <Dialog open={openPopup} onClose={handlePopupClose}>
-        <DialogTitle>Choose surrounding for orography factor</DialogTitle>
-        <DialogContent>
-          <RadioGroup value={selectedOrography} onChange={handleOrographyChange}>
-            <FormControlLabel value="choice1" control={<Radio />} label="Flat land or gentle hills" />
-            <FormControlLabel value="choice2" control={<Radio />} label="Steep hills or cliffs" />
-          </RadioGroup>
-          <Button onClick={handlePopupClose} 
-          variant="contained" 
-          disabled={!isOrographySelected}>
-            Apply
-          </Button>
-        </DialogContent>
-      </Dialog>
+      <Dialog open={openPopup} onClose={handlePopupClose} sx={{ maxWidth: 'cg', width: '100%' }} >
+      <DialogTitle>Choose surrounding for orography factor</DialogTitle>
+      <DialogContent>
+        <RadioGroup value={selectedOrography} onChange={handleOrographyChange}>
+          <FormControlLabel
+            value="choice1"
+            control={<Radio />}
+            label={
+              <div style={{ display: 'flex', alignItems: 'center'}}>
+                <img
+                  src={smooth} 
+                  alt="smooth terrain"
+                  style={{ marginRight: '1rem', height:'10rem' , width:'10rem' }}
+                /> 
+                <div>
+                  <strong>Flat land or gentle hills : </strong> <br/>
+                  The orography is made up of obstacles  <br/>
+                  of varying heights and shapes.This type of  <br/>
+                  orography is the most frequently encountered;  <br/>
+                  in this case, the orography coefficient Co is  <br/> 
+                  calculated automatically according to procedure  <br/>
+                  1 described in the NF EN-1991-1-4/NA.
+                  
+                </div>
+              </div>
+            }
+            labelPlacement="end" // This places the label after the image
+          />
+          <FormControlLabel
+            value="choice2"
+            control={<Radio />}
+            label={
+              <div style={{ display: 'flex', alignItems: 'center' ,marginTop: '1rem'}}>
+                <img
+                  src={rugged}
+                  alt="rugged terrain"
+                  style={{ marginRight: '1rem', height:'10rem', width:'10rem' }}
+                />
+                <div>
+                  <strong>Steep hills or cliffs :</strong> <br/>
+                  The orography is made up of well-individualized<br/> 
+                  obstacles. An isolated cliff or hill belong to <br/>
+                  this category of orography, and is more rarely <br/>
+                  encountered. In this case, the Co coefficient of <br/>
+                  orography is calculated manually according <br/>
+                  procedure 2 of the NF EN-1991-1-4/NA.
+                </div>
+              </div>
+            }
+            labelPlacement="end" // This places the label after the image
+          />
+        </RadioGroup>
+        <Button onClick={handlePopupClose} variant="contained" disabled={!isOrographySelected}
+        style={{ marginTop:'2rem'}}>
+          Apply
+        </Button>
+      </DialogContent>
+    </Dialog>
     </div>
   );
 }
