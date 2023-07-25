@@ -25,6 +25,12 @@ export default function Step2({handleBack, handleNext}) {
   const [allRoofFieldsFilled, setAllRoofFieldsFilled] = React.useState(false);
   const [allObstacleFieldsFilled, setAllObstacleFieldsFilled] = React.useState(false);
   const [activeTab, setActiveTab] = React.useState(0);
+  const [canDrawCircles, setCanDrawCircles] = React.useState(false);
+  const [polygons, setPolygons] = React.useState([]); // Step 7
+  const [isDrawingPolygon, setIsDrawingPolygon] = React.useState(false); // Step 8
+  
+
+
 
   const roofHeightError = roofHeightTouched  && roofHeight=== ''; 
   const distanceBoardError = distanceBoardTouched && distanceBoard === '';
@@ -92,15 +98,15 @@ export default function Step2({handleBack, handleNext}) {
   };
 
   const checkAllObstacleFieldsFilled = () => {
-    if (
-      obstacleHeight !== '' &&
-      offsetZone !== '' 
-    ) {
+    if (obstacleHeight !== '' && offsetZone !== '') {
       setAllObstacleFieldsFilled(true);
+      setCanDrawCircles(true);
     } else {
       setAllObstacleFieldsFilled(false);
+      setCanDrawCircles(false);
     }
   };
+  
 
   // useEffect to check for changes in text field values and other conditions. 
   React.useEffect(() => {
@@ -114,6 +120,7 @@ export default function Step2({handleBack, handleNext}) {
     const numberValue = value.replace(/[^0-9.]/g, ''); // Allow only numbers and a dot
     setStateFunc(numberValue);
   };
+  
 
   const [polygonPoints, setPolygonPoints] = React.useState([]); // Step 1
   const [isPolygonComplete, setPolygonComplete] = React.useState(false); // Step 1
@@ -121,45 +128,142 @@ export default function Step2({handleBack, handleNext}) {
     x: 0,
     y: 0,
   }); // Step 2
+  const [zoomLevel, setZoomLevel] = React.useState(1);
 
    // Function to add a new point to the polygon
    const addPolygonPoint = (x, y) => {
-    setPolygonPoints([...polygonPoints, { x, y }]);
+    setPolygonPoints([...polygonPoints, { x: x / zoomLevel, y: y / zoomLevel }]);
   };
 
-  // Step 2: Event listener for mouse click on the SVG canvas
-  const handleSVGClick = (e) => {
-    const svgRect = e.target.getBoundingClientRect();
-    const svgX = e.clientX - svgRect.left;
-    const svgY = e.clientY - svgRect.top;
-
-    // Step 3: Create initial circle when "Create" button is clicked
-    if (!isPolygonComplete) {
-      setPolygonPoints([{ x: svgX, y: svgY }]);
-      setInitialClickCoordinates({ x: svgX, y: svgY }); // Store initial click coordinates
-      setPolygonComplete(true);
-    } else {
-      // Add new point to the polygon if it's not the initial circle
-      addPolygonPoint(svgX, svgY);
+  const handleSVGDoubleClick = (e) => {
+    if (canDrawCircles) {
+      const svgRect = e.target.getBoundingClientRect();
+      const svgX = (e.clientX - svgRect.left) / zoomLevel; // Adjust X coordinate for zoom
+      const svgY = (e.clientY - svgRect.top) / zoomLevel; // Adjust Y coordinate for zoom
+  
+      // Step 3: Create initial circle when "Create" button is clicked
+      if (!isPolygonComplete) {
+        setPolygonPoints([{ x: svgX, y: svgY }]);
+        setInitialClickCoordinates({ x: svgX, y: svgY }); // Store initial click coordinates
+        setPolygonComplete(true);
+      } else {
+        // Add new point to the polygon if it's not the initial circle
+        addPolygonPoint(svgX, svgY);
+      }
     }
   };
+  
 
 
-  // Step 4: Handle click on initial circle to complete the polygon
-  const handleInitialCircleClick = () => {
-    setPolygonComplete(false);
-    setPolygonPoints(polygonPoints.slice(0, -1));
+  const handlePolygonComplete = () => {
+    if (isDrawingPolygon && polygonPoints.length > 0) {
+      // Adjust points for zoom before saving
+      const adjustedPoints = polygonPoints.map((point) => ({
+        x: point.x / zoomLevel,
+        y: point.y / zoomLevel,
+      }));
+      // Add the final line segment (connecting the last point to the initial point)
+      const completedPolygonPoints = [...adjustedPoints, adjustedPoints[0]];
+      // Save the points of the current polygon in localStorage
+      localStorage.setItem('currentPolygon', JSON.stringify(completedPolygonPoints));
+      setIsDrawingPolygon(false); // Stop drawing the current polygon
+  
+      // Add the current polygon to the list of polygons and save it in local storage
+      const updatedPolygons = [...polygons, completedPolygonPoints];
+      setPolygons(updatedPolygons);
+      localStorage.setItem('polygons', JSON.stringify(updatedPolygons));
+    }
   };
-
-   // Step 5: Handle click on the "Reset" button to undo the last action on the canvas
-   const handleResetClick = () => {
-    if (isPolygonComplete && polygonPoints.length > 0) {
-      // If the polygon is complete and there are points in the polygonPoints array, remove the last point
+  
+  
+  
+  const handleResetClick = () => {
+    if (isDrawingPolygon && polygonPoints.length > 0) {
+      // If the polygon is being drawn and there are points in the polygonPoints array, remove the last point
       const updatedPoints = polygonPoints.slice(0, -1);
       setPolygonPoints(updatedPoints);
       setPolygonComplete(updatedPoints.length > 0); // Check if the polygon is still complete
+      localStorage.setItem('currentPolygon', JSON.stringify(updatedPoints));
+    } else if (!isDrawingPolygon) {
+      // If the polygon is complete, reset the drawing state and points
+      setPolygonPoints([]);
+      setIsDrawingPolygon(false);
+      setPolygonComplete(false);
+      localStorage.removeItem('currentPolygon');
     }
   };
+
+  const renderCurrentPolygon = () => {
+    // Check if there are points in localStorage for the current polygon
+    const savedPoints = JSON.parse(localStorage.getItem('currentPolygon'));
+  
+    if (isDrawingPolygon && polygonPoints.length > 1) {
+      const pathData = `M ${initialClickCoordinates.x} ${initialClickCoordinates.y} L ${polygonPoints
+        .map((point) => `${point.x} ${point.y}`)
+        .join(' ')} Z`;
+  
+      return <path d={pathData} fill="none" stroke="blue" />;
+    } else if (!isDrawingPolygon && savedPoints && savedPoints.length > 1) {
+      const pathData = `M ${initialClickCoordinates.x} ${initialClickCoordinates.y} L ${savedPoints
+        .map((point) => `${point.x} ${point.y}`)
+        .join(' ')} Z`;
+  
+      return <path d={pathData} fill="none" stroke="blue" />;
+    }
+  
+    return null;
+  };
+
+  const handleCreateClick = () => {
+    if (!isDrawingPolygon) {
+      setIsDrawingPolygon(true); // Start drawing a new polygon
+      setPolygonComplete(false);
+      // Save the existing polygons in localStorage
+      localStorage.setItem('polygons', JSON.stringify(polygons));
+      // Reset the polygon points to start drawing a new polygon
+      setPolygonPoints([]);
+  
+      // Update initialClickCoordinates to the last circle of the previous polygon
+      if (polygonPoints.length > 0) {
+        setInitialClickCoordinates({
+          x: polygonPoints[polygonPoints.length - 1].x,
+          y: polygonPoints[polygonPoints.length - 1].y,
+        });
+      }
+    }
+  };
+
+   // Add this useEffect to clear polygons on component mount
+   React.useEffect(() => {
+    // Clear polygons from local storage when the component mounts
+    localStorage.removeItem('polygons');
+  }, [])
+  
+  
+ 
+  React.useEffect(() => {
+    // Check if there are existing polygons in localStorage
+    const savedPolygons = JSON.parse(localStorage.getItem('polygons'));
+    if (savedPolygons && savedPolygons.length > 0) {
+      setPolygons(savedPolygons); // Load existing polygons from localStorage
+    }
+  }, []);
+  
+  const renderPolygons = () => {
+    return polygons.map((polygon, index) => (
+      <polyline
+        key={index}
+        points={polygon.map((point) => `${point.x},${point.y}`).join(' ')}
+        fill="none"
+        stroke="blue"
+      />
+    ));
+  };
+
+  const handleZoomChange = (value) => {
+    setZoomLevel(value.a);
+  };
+  
 
   return (
     <div style={{ display: 'flex' }}>
@@ -305,36 +409,29 @@ export default function Step2({handleBack, handleNext}) {
               value={offsetZone}
             />
 
-          <Button
-            disabled={!allObstacleFieldsFilled || polygonPoints.length > 0}
-            style={{
-              backgroundColor: !allObstacleFieldsFilled ? 'gray' : '#1a83ff',
-              color: 'white',
-            }}
-            onClick={() => {
-              if (!isPolygonComplete) {
-                // The circle has already been created on the first click, no additional code needed here.
-              } else {
-                // Code to handle the completion of the polygon.
-                setPolygonComplete(false);
-                setPolygonPoints([]);
-              }
-            }}
+            <Button
+              disabled={!canDrawCircles}
+              style={{
+                backgroundColor: !canDrawCircles ? 'gray' : '#1a83ff',
+                color: 'white',
+              }}
+              onClick={handleCreateClick}
             >
-            Create
-          </Button>
+              {isDrawingPolygon ? 'Add Points' : 'Add Polygone'}
+            </Button>
 
-           {/* New "Reset" button to reset the shape to the previous state it was in */}
-          <Button
-            disabled={!isPolygonComplete || polygonPoints.length === 0}
-            style={{
-              backgroundColor: !isPolygonComplete || polygonPoints.length === 0 ? 'gray' : '#1a83ff',
-              color: 'white',
-            }}
-            onClick={handleResetClick}
-          >
-            Reset
-          </Button>
+            {/* New "Reset" button to reset the shape to the previous state it was in */}
+            <Button
+              disabled={isDrawingPolygon && polygonPoints.length === 0}
+              style={{
+                backgroundColor: isDrawingPolygon && polygonPoints.length === 0 ? 'gray' : '#1a83ff',
+                color: 'white',
+              }}
+              onClick={handleResetClick}
+            >
+              Reset
+            </Button>
+
 
         </Box>
         </div>
@@ -357,48 +454,46 @@ export default function Step2({handleBack, handleNext}) {
       <div style={{ flex: 2, marginRight: '1rem', marginTop: '1rem' }}>
         <div
           style={{ width: '40rem', height: '15rem' }}
-          onClick={handleSVGClick}
+         onDoubleClick={handleSVGDoubleClick}
         >
-          <UncontrolledReactSVGPanZoom ref={Viewer} width={800} height={600}>
-            <svg
-              width="500px"
-              height="500px"
-              viewBox={`0 0 ${800} ${600}`}
-              style={{ overflow: 'visible' }}
-            >
+          <UncontrolledReactSVGPanZoom ref={Viewer} width={800} height={600} onChangeValue={handleZoomChange}>
+            <svg width="500px" height="500px" viewBox={`0 0 ${800} ${600}`} style={{ overflow: 'visible' }}>
               {allRoofFieldsFilled && <image x="0" y="0" width="500" height="500" href={rugged} />}
 
-              {/** Group to hold the circles and lines of the polygon */}
+              {/* Render completed polygons */}
+              {polygons.map((polygon, index) => (
+                <polyline
+                  key={index}
+                  points={polygon.map((point) => `${point.x},${point.y}`).join(' ')}
+                  fill="none"
+                  stroke="blue"
+                />
+              ))}
+
+              {/* Render the current polygon */}
+              {renderCurrentPolygon()}
+
+              {/* Group to hold the circles and lines of the current polygon */}
               <g>
-                {isPolygonComplete &&
+                {isDrawingPolygon &&
                   polygonPoints.map((point, index) => (
                     <circle key={index} cx={point.x} cy={point.y} r="5" fill="red" />
                   ))}
 
-                {/* Render the polyline */}
-                {isPolygonComplete && polygonPoints.length > 1 && (
-                  <polyline
-                    points={[
-                      ...polygonPoints.map((point) => `${point.x},${point.y}`),
-                      `${initialClickCoordinates.x},${initialClickCoordinates.y}`, // Add the initial point to close the polygon
-                    ].join(' ')}
-                    fill="none"
-                    stroke="blue"
-                  />
-                )}
-
-                {isPolygonComplete && polygonPoints.length > 0 && (
+                {/* Render the initial circle */}
+                {isDrawingPolygon && polygonPoints.length > 0 && (
                   <circle
                     cx={initialClickCoordinates.x}
                     cy={initialClickCoordinates.y}
                     r="5"
                     fill="red"
-                    onClick={handleInitialCircleClick}
+                    onClick={handlePolygonComplete} // Call the new function to complete the polygon
                   />
                 )}
               </g>
             </svg>
           </UncontrolledReactSVGPanZoom>
+
         </div>
       </div>
     </div>
