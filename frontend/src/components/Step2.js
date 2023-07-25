@@ -1,7 +1,7 @@
 import * as React from 'react';
 import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
-import { Button, InputAdornment, MenuItem, Typography } from '@mui/material';
+import { Button, InputAdornment, MenuItem } from '@mui/material';
 import { UncontrolledReactSVGPanZoom } from 'react-svg-pan-zoom';
 import { Tab, Tabs } from '@mui/material';
 import rugged from '../assets/rugged_terrain.png';
@@ -26,7 +26,6 @@ export default function Step2({handleBack, handleNext}) {
   const [allObstacleFieldsFilled, setAllObstacleFieldsFilled] = React.useState(false);
   const [activeTab, setActiveTab] = React.useState(0);
 
-
   const roofHeightError = roofHeightTouched  && roofHeight=== ''; 
   const distanceBoardError = distanceBoardTouched && distanceBoard === '';
   const penteError = penteTouched && pente === '';
@@ -34,7 +33,6 @@ export default function Step2({handleBack, handleNext}) {
   const parapetHeightError = parapetHeightTouched && parapetHeight === ''; 
   const obstacleHeightError = obstacleHeightTouched && obstacleHeight === '';
   const offsetZoneError = offsetZoneTouched && offsetZone === '' ;
-
 
   const handleRoofHeightBlur = () => {
     setRoofHeightTouched(true);
@@ -104,14 +102,12 @@ export default function Step2({handleBack, handleNext}) {
     }
   };
 
-  // useEffect to check for changes in text field values
+  // useEffect to check for changes in text field values and other conditions. 
   React.useEffect(() => {
     checkAllRoofFieldsFilled();
-  }, [roofHeight, distanceBoard, pente, membraneType, parapetHeight]);
-
-  React.useEffect(() => {
     checkAllObstacleFieldsFilled();
-  }, [obstacleHeight, offsetZone]);
+  }, [roofHeight, distanceBoard, pente, membraneType, parapetHeight, obstacleHeight, offsetZone]);
+
 
   // function to handle input validation for numbers
   const handleNumberInput = (value, setStateFunc) => {
@@ -119,6 +115,51 @@ export default function Step2({handleBack, handleNext}) {
     setStateFunc(numberValue);
   };
 
+  const [polygonPoints, setPolygonPoints] = React.useState([]); // Step 1
+  const [isPolygonComplete, setPolygonComplete] = React.useState(false); // Step 1
+  const [initialClickCoordinates, setInitialClickCoordinates] = React.useState({
+    x: 0,
+    y: 0,
+  }); // Step 2
+
+   // Function to add a new point to the polygon
+   const addPolygonPoint = (x, y) => {
+    setPolygonPoints([...polygonPoints, { x, y }]);
+  };
+
+  // Step 2: Event listener for mouse click on the SVG canvas
+  const handleSVGClick = (e) => {
+    const svgRect = e.target.getBoundingClientRect();
+    const svgX = e.clientX - svgRect.left;
+    const svgY = e.clientY - svgRect.top;
+
+    // Step 3: Create initial circle when "Create" button is clicked
+    if (!isPolygonComplete) {
+      setPolygonPoints([{ x: svgX, y: svgY }]);
+      setInitialClickCoordinates({ x: svgX, y: svgY }); // Store initial click coordinates
+      setPolygonComplete(true);
+    } else {
+      // Add new point to the polygon if it's not the initial circle
+      addPolygonPoint(svgX, svgY);
+    }
+  };
+
+
+  // Step 4: Handle click on initial circle to complete the polygon
+  const handleInitialCircleClick = () => {
+    setPolygonComplete(false);
+    setPolygonPoints(polygonPoints.slice(0, -1));
+  };
+
+   // Step 5: Handle click on the "Reset" button to undo the last action on the canvas
+   const handleResetClick = () => {
+    if (isPolygonComplete && polygonPoints.length > 0) {
+      // If the polygon is complete and there are points in the polygonPoints array, remove the last point
+      const updatedPoints = polygonPoints.slice(0, -1);
+      setPolygonPoints(updatedPoints);
+      setPolygonComplete(updatedPoints.length > 0); // Check if the polygon is still complete
+    }
+  };
 
   return (
     <div style={{ display: 'flex' }}>
@@ -264,9 +305,41 @@ export default function Step2({handleBack, handleNext}) {
               value={offsetZone}
             />
 
-            <Button disabled={!allObstacleFieldsFilled} style={{backgroundColor: !allObstacleFieldsFilled ? 'gray' : '#1a83ff', color: 'white' }}>Create</Button>
-          </Box>
+          <Button
+            disabled={!allObstacleFieldsFilled || polygonPoints.length > 0}
+            style={{
+              backgroundColor: !allObstacleFieldsFilled ? 'gray' : '#1a83ff',
+              color: 'white',
+            }}
+            onClick={() => {
+              if (!isPolygonComplete) {
+                // The circle has already been created on the first click, no additional code needed here.
+              } else {
+                // Code to handle the completion of the polygon.
+                setPolygonComplete(false);
+                setPolygonPoints([]);
+              }
+            }}
+            >
+            Create
+          </Button>
+
+           {/* New "Reset" button to reset the shape to the previous state it was in */}
+          <Button
+            disabled={!isPolygonComplete || polygonPoints.length === 0}
+            style={{
+              backgroundColor: !isPolygonComplete || polygonPoints.length === 0 ? 'gray' : '#1a83ff',
+              color: 'white',
+            }}
+            onClick={handleResetClick}
+          >
+            Reset
+          </Button>
+
+        </Box>
         </div>
+
+
         <div style={{ display: "flex" , marginRight: '1rem' }}>
           <div style={{ display: 'flex', justifyContent: 'flex-start', marginTop: '1rem'}}>
             <Button onClick={handleBack} style={{ backgroundColor: '#1a83ff', color: 'white' }}>
@@ -279,20 +352,55 @@ export default function Step2({handleBack, handleNext}) {
             </Button>
           </div>
         </div>
-        
-
       </div>
 
-      <div style={{ flex: 2 , marginRight: '1rem', marginTop: '1rem' }}>
-        <div style={{ width: '40rem' , height: '15rem' }}>
+      <div style={{ flex: 2, marginRight: '1rem', marginTop: '1rem' }}>
+        <div
+          style={{ width: '40rem', height: '15rem' }}
+          onClick={handleSVGClick}
+        >
           <UncontrolledReactSVGPanZoom ref={Viewer} width={800} height={600}>
-            <svg width="500px" height="500px" viewBox={`0 0 ${500} ${500}`}>
+            <svg
+              width="500px"
+              height="500px"
+              viewBox={`0 0 ${800} ${600}`}
+              style={{ overflow: 'visible' }}
+            >
               {allRoofFieldsFilled && <image x="0" y="0" width="500" height="500" href={rugged} />}
+
+              {/** Group to hold the circles and lines of the polygon */}
+              <g>
+                {isPolygonComplete &&
+                  polygonPoints.map((point, index) => (
+                    <circle key={index} cx={point.x} cy={point.y} r="5" fill="red" />
+                  ))}
+
+                {/* Render the polyline */}
+                {isPolygonComplete && polygonPoints.length > 1 && (
+                  <polyline
+                    points={[
+                      ...polygonPoints.map((point) => `${point.x},${point.y}`),
+                      `${initialClickCoordinates.x},${initialClickCoordinates.y}`, // Add the initial point to close the polygon
+                    ].join(' ')}
+                    fill="none"
+                    stroke="blue"
+                  />
+                )}
+
+                {isPolygonComplete && polygonPoints.length > 0 && (
+                  <circle
+                    cx={initialClickCoordinates.x}
+                    cy={initialClickCoordinates.y}
+                    r="5"
+                    fill="red"
+                    onClick={handleInitialCircleClick}
+                  />
+                )}
+              </g>
             </svg>
           </UncontrolledReactSVGPanZoom>
         </div>
       </div>
-
     </div>
   );
 }

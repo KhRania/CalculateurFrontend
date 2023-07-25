@@ -1,0 +1,58 @@
+#title_modal-point {
+    color: #5D67FF;
+    text-align: center;
+    font-size: 15px;
+  }
+  
+  #circleSvg {
+  
+    fill: white
+  }
+  
+  #circleSvg:hover {
+  
+    /* cursor: "pointer"; */
+    fill: red;
+    font-weight: bold;
+  }
+  
+  #bottondeplicate {
+    left: 35px
+  }
+  
+  #bottondelate {
+    left: 5%;
+    top: 20%
+  }
+  
+  .static {
+    cursor: not-allowed;
+  }
+  
+  .draggable {
+    cursor: move;
+  }
+  
+  #one {
+    position: relative;
+    z-index: 10;
+  }
+  
+  #two {
+    position: relative;
+    z-index: -1;
+  }
+  
+  #red {
+    background-color: red;
+  }
+  
+  #G {
+    background: #cff;
+    border: 1px dashed black;
+  }
+  
+  #G:hover {
+    background: #acc;
+    border: 1px solid black;
+  }
