@@ -4,6 +4,10 @@ import TextField from '@mui/material/TextField';
 import { Button, InputAdornment, MenuItem } from '@mui/material';
 import { UncontrolledReactSVGPanZoom } from 'react-svg-pan-zoom';
 import { Tab, Tabs } from '@mui/material';
+import Dialog from '@mui/material/Dialog';
+import DialogTitle from '@mui/material/DialogTitle';
+import DialogContent from '@mui/material/DialogContent';
+import DialogActions from '@mui/material/DialogActions';
 import rugged from '../assets/rugged_terrain.png';
 
 
@@ -28,6 +32,55 @@ export default function Step2({handleBack, handleNext}) {
   const [canDrawCircles, setCanDrawCircles] = React.useState(false);
   const [polygons, setPolygons] = React.useState([]); // Step 7
   const [isDrawingPolygon, setIsDrawingPolygon] = React.useState(false); // Step 8
+
+  /////////////////////////////////////////////////////////////////
+  const [isDialogOpen, setIsDialogOpen] = React.useState(false);
+  const [rectWidth, setRectWidth] = React.useState('');
+  const [rectHeight, setRectHeight] = React.useState('');
+  const [rectangles, setRectangles] = React.useState([]);
+
+
+  const handleAddRectangleClick = () => {
+    setIsDialogOpen(true);
+  };
+  const handleDialogClose = () => {
+    setIsDialogOpen(false);
+  };
+  const handleApplyClick = () => {
+    // Check if both width and height are valid numbers
+    if (!isNaN(parseFloat(rectWidth)) && !isNaN(parseFloat(rectHeight))) {
+      // Calculate the starting coordinates of the rectangle
+      const svgWidth = 800; // Replace with the actual width of the SVG canvas
+      const svgHeight = 600; // Replace with the actual height of the SVG canvas
+      const centerX = svgWidth / 2;
+      const centerY = svgHeight / 2;
+      const startX = centerX - parseFloat(rectWidth) / 2;
+      const startY = centerY - parseFloat(rectHeight) / 2;
+  
+      // Create a new rectangle element
+      const newRectangle = (
+        <rect
+          key={rectangles.length} // Assign a unique key to the rectangle
+          x={startX}
+          y={startY}
+          width={parseFloat(rectWidth)}
+          height={parseFloat(rectHeight)}
+          fill='transparent'
+          stroke="green"
+          strokeWidth="2"
+        />
+      );
+  
+      // Add the new rectangle to the list of rectangles
+      setRectangles([...rectangles, newRectangle]);
+    }
+  
+    // Close the dialog
+    setIsDialogOpen(false);
+  };
+  
+  ///////////////////////////////////////////////  
+  
   
 
 
@@ -191,7 +244,12 @@ export default function Step2({handleBack, handleNext}) {
       setPolygonComplete(false);
       localStorage.removeItem('currentPolygon');
     }
+  
+    // Remove the most recent rectangle from the rectangles state
+    const updatedRectangles = rectangles.slice(0, -1);
+    setRectangles(updatedRectangles);
   };
+  
 
   const renderCurrentPolygon = () => {
     // Check if there are points in localStorage for the current polygon
@@ -248,6 +306,22 @@ export default function Step2({handleBack, handleNext}) {
       setPolygons(savedPolygons); // Load existing polygons from localStorage
     }
   }, []);
+
+  const handleClearCanvasClick = () => {
+    // Clear the current polygon state
+    setPolygonPoints([]);
+    setIsDrawingPolygon(false);
+    setPolygonComplete(false);
+    localStorage.removeItem('currentPolygon');
+  
+    // Clear the polygons state
+    setPolygons([]);
+    localStorage.removeItem('polygons');
+  
+    // Clear the rectangles state
+    setRectangles([]);
+  };
+  
   
   const renderPolygons = () => {
     return polygons.map((polygon, index) => (
@@ -420,6 +494,54 @@ export default function Step2({handleBack, handleNext}) {
               {isDrawingPolygon ? 'Add Points' : 'Add Polygone'}
             </Button>
 
+
+            <Button
+              disabled={!canDrawCircles}
+              style={{
+                backgroundColor: !canDrawCircles ? 'gray' : '#1a83ff',
+                color: 'white',
+              }}
+              onClick={handleAddRectangleClick}
+            >
+              Add Rectangle
+            </Button>
+
+            <Dialog open={isDialogOpen} onClose={handleDialogClose}>
+              <DialogTitle>Give Rectangle Dimensions</DialogTitle>
+              <DialogContent>
+                <TextField
+                  required
+                  label="Width"
+                  value={rectWidth}
+                  onChange={(e) => handleNumberInput(e.target.value, setRectWidth)}
+                  sx={{ m: 1, width: '100px' }}
+                  InputProps={{
+                    endAdornment: <InputAdornment position="end">m</InputAdornment>,
+                  }}
+                />
+                <TextField
+                  required
+                  label="Height"
+                  value={rectHeight}
+                  onChange={(e) => handleNumberInput(e.target.value, setRectHeight)}
+                  sx={{ m: 1, width: '100px' }}
+                  InputProps={{
+                    endAdornment: <InputAdornment position="end">m</InputAdornment>,
+                  }}
+                />
+              </DialogContent>
+              <DialogActions>
+                <Button onClick={handleDialogClose} color="primary">
+                  Cancel
+                </Button>
+                <Button onClick={handleApplyClick} color="primary">
+                  Apply
+                </Button>
+              </DialogActions>
+            </Dialog>
+
+
+
             {/* New "Reset" button to reset the shape to the previous state it was in */}
             <Button
               disabled={isDrawingPolygon && polygonPoints.length === 0}
@@ -430,6 +552,14 @@ export default function Step2({handleBack, handleNext}) {
               onClick={handleResetClick}
             >
               Reset
+            </Button>
+
+            {/* New "Clear Canvas" button to clear everything from the canvas */}
+            <Button
+              style={{ backgroundColor: '#ff1a1a', color: 'white' }}
+              onClick={handleClearCanvasClick}
+            >
+              Clear Canvas
             </Button>
 
 
@@ -472,6 +602,9 @@ export default function Step2({handleBack, handleNext}) {
 
               {/* Render the current polygon */}
               {renderCurrentPolygon()}
+
+              {/* Render the rectangles */}
+              {rectangles.map((rectangle, index) => rectangle)}
 
               {/* Group to hold the circles and lines of the current polygon */}
               <g>
