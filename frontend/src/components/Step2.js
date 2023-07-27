@@ -2,7 +2,7 @@ import * as React from 'react';
 import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
 import { Button, InputAdornment, MenuItem } from '@mui/material';
-import { UncontrolledReactSVGPanZoom } from 'react-svg-pan-zoom';
+import { ReactSVGPanZoom, TOOL_NONE } from 'react-svg-pan-zoom';
 import { Tab, Tabs } from '@mui/material';
 import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
@@ -30,10 +30,15 @@ export default function Step2({handleBack, handleNext}) {
   const [allObstacleFieldsFilled, setAllObstacleFieldsFilled] = React.useState(false);
   const [activeTab, setActiveTab] = React.useState(0);
   const [canDrawCircles, setCanDrawCircles] = React.useState(false);
-  const [polygons, setPolygons] = React.useState([]); // Step 7
-  const [isDrawingPolygon, setIsDrawingPolygon] = React.useState(false); // Step 8
+  const [polygons, setPolygons] = React.useState([]);
+  const [isDrawingPolygon, setIsDrawingPolygon] = React.useState(false);
+  const [firstCircleColor, setFirstCircleColor] = React.useState('red');
+  const [isAddingPolygon, setIsAddingPolygon] = React.useState(false);
+  const [isAddingRectangle, setIsAddingRectangle] = React.useState(false);
+  const [isDrawing, setIsDrawing] = React.useState(false);
 
-  /////////////////////////////////////////////////////////////////
+
+  ////////////////////////////////////////////////////////////////////////////////////////////////
   const [isDialogOpen, setIsDialogOpen] = React.useState(false);
   const [rectWidth, setRectWidth] = React.useState('');
   const [rectHeight, setRectHeight] = React.useState('');
@@ -41,10 +46,14 @@ export default function Step2({handleBack, handleNext}) {
 
 
   const handleAddRectangleClick = () => {
+    setIsAddingRectangle(true); // Toggle the active state of the "Add Rectangle" button
     setIsDialogOpen(true);
   };
+
   const handleDialogClose = () => {
     setIsDialogOpen(false);
+    // Reset the active state of the buttons when the dialog is closed
+    setIsAddingRectangle(false);
   };
   const handleApplyClick = () => {
     // Check if both width and height are valid numbers
@@ -77,9 +86,11 @@ export default function Step2({handleBack, handleNext}) {
   
     // Close the dialog
     setIsDialogOpen(false);
+    setIsAddingRectangle(false);
+    
   };
   
-  ///////////////////////////////////////////////  
+  ////////////////////////////////////////////////////////////////////////////
   
   
 
@@ -124,17 +135,20 @@ export default function Step2({handleBack, handleNext}) {
     setOffsetZoneTouched(true);
   }
 
-  const Viewer = React.useRef(null);
-
+  const Viewer = React.useRef({ value: null });
+  
+  
   React.useEffect(() => {
     Viewer.current.fitToViewer();
   }, []);
+  
 
   React.useEffect(() => {
     if (Viewer.current !== null) {
-      Viewer.current.zoomOnViewerCenter(1.1);
+      Viewer.current.fitToViewer();
     }
   }, [Viewer.current]);
+  
 
   const checkAllRoofFieldsFilled = () => {
     if (
@@ -165,6 +179,16 @@ export default function Step2({handleBack, handleNext}) {
   React.useEffect(() => {
     checkAllRoofFieldsFilled();
     checkAllObstacleFieldsFilled();
+    // Update the state to indicate that drawing is in progress
+    if (isDrawingPolygon && polygonPoints.length > 0) {
+      setIsDrawing(true);
+    } else {
+      setIsDrawing(false);
+    }
+    // Call the function to handle drawing completion when the polygon is complete
+    if (isDrawingPolygon && isPolygonComplete) {
+      handleDrawingComplete();
+    }
   }, [roofHeight, distanceBoard, pente, membraneType, parapetHeight, obstacleHeight, offsetZone]);
 
 
@@ -175,13 +199,14 @@ export default function Step2({handleBack, handleNext}) {
   };
   
 
-  const [polygonPoints, setPolygonPoints] = React.useState([]); // Step 1
-  const [isPolygonComplete, setPolygonComplete] = React.useState(false); // Step 1
+  const [polygonPoints, setPolygonPoints] = React.useState([]); 
+  const [isPolygonComplete, setPolygonComplete] = React.useState(false); 
   const [initialClickCoordinates, setInitialClickCoordinates] = React.useState({
     x: 0,
     y: 0,
-  }); // Step 2
+  }); 
   const [zoomLevel, setZoomLevel] = React.useState(1);
+  const [tool, setTool] = React.useState('auto'); // Set the initial tool to 'auto' for automatic panning
 
    // Function to add a new point to the polygon
    const addPolygonPoint = (x, y) => {
@@ -191,10 +216,10 @@ export default function Step2({handleBack, handleNext}) {
   const handleSVGDoubleClick = (e) => {
     if (canDrawCircles) {
       const svgRect = e.target.getBoundingClientRect();
-      const svgX = (e.clientX - svgRect.left) / zoomLevel; // Adjust X coordinate for zoom
-      const svgY = (e.clientY - svgRect.top) / zoomLevel; // Adjust Y coordinate for zoom
+      const svgX = (e.clientX - svgRect.left) / zoomLevel;
+      const svgY = (e.clientY - svgRect.top) / zoomLevel; 
   
-      // Step 3: Create initial circle when "Create" button is clicked
+      // Create initial circle when "Create" button is clicked
       if (!isPolygonComplete) {
         setPolygonPoints([{ x: svgX, y: svgY }]);
         setInitialClickCoordinates({ x: svgX, y: svgY }); // Store initial click coordinates
@@ -220,11 +245,15 @@ export default function Step2({handleBack, handleNext}) {
       // Save the points of the current polygon in localStorage
       localStorage.setItem('currentPolygon', JSON.stringify(completedPolygonPoints));
       setIsDrawingPolygon(false); // Stop drawing the current polygon
-  
+      setIsAddingPolygon(false);
       // Add the current polygon to the list of polygons and save it in local storage
       const updatedPolygons = [...polygons, completedPolygonPoints];
       setPolygons(updatedPolygons);
       localStorage.setItem('polygons', JSON.stringify(updatedPolygons));
+      setIsDrawingPolygon(false); // Stop drawing the current polygon
+      //  Set the color of the first circle to red after finishing the polygon
+      setFirstCircleColor('red');
+
     }
   };
   
@@ -260,7 +289,20 @@ export default function Step2({handleBack, handleNext}) {
         .map((point) => `${point.x} ${point.y}`)
         .join(' ')} Z`;
   
-      return <path d={pathData} fill="none" stroke="blue" />;
+      return (
+        <g>
+          {polygonPoints.map((point, index) => (
+            <circle
+              key={index}
+              cx={point.x}
+              cy={point.y}
+              r="5"
+              fill={index === 0 ? firstCircleColor : 'red'}
+            />
+          ))}
+          <path d={pathData} fill="none" stroke="blue" />
+        </g>
+      );
     } else if (!isDrawingPolygon && savedPoints && savedPoints.length > 1) {
       const pathData = `M ${initialClickCoordinates.x} ${initialClickCoordinates.y} L ${savedPoints
         .map((point) => `${point.x} ${point.y}`)
@@ -280,7 +322,11 @@ export default function Step2({handleBack, handleNext}) {
       localStorage.setItem('polygons', JSON.stringify(polygons));
       // Reset the polygon points to start drawing a new polygon
       setPolygonPoints([]);
-  
+      //  Toggle the active state of the "Add Polygon" button
+      setIsAddingPolygon(true);
+      //  Reset the first circle color to green when drawing starts
+      setFirstCircleColor('green');
+
       // Update initialClickCoordinates to the last circle of the previous polygon
       if (polygonPoints.length > 0) {
         setInitialClickCoordinates({
@@ -290,7 +336,7 @@ export default function Step2({handleBack, handleNext}) {
       }
     }
   };
-
+  
    // Add this useEffect to clear polygons on component mount
    React.useEffect(() => {
     // Clear polygons from local storage when the component mounts
@@ -321,23 +367,31 @@ export default function Step2({handleBack, handleNext}) {
     // Clear the rectangles state
     setRectangles([]);
   };
-  
-  
-  const renderPolygons = () => {
-    return polygons.map((polygon, index) => (
-      <polyline
-        key={index}
-        points={polygon.map((point) => `${point.x},${point.y}`).join(' ')}
-        fill="none"
-        stroke="blue"
-      />
-    ));
+  const handleChangeTool = (tool) => {
+    setTool(tool);
   };
+  
 
   const handleZoomChange = (value) => {
     setZoomLevel(value.a);
   };
   
+  // Function to handle the completion of drawing
+  const handleDrawingComplete = () => {
+    if (isDrawingPolygon && polygonPoints.length > 0) {
+      setIsDrawingPolygon(false); // Stop drawing the current polygon
+      setPolygonComplete(true); // Mark the polygon as complete
+      setFirstCircleColor('red'); // Reset the first circle color to red
+
+      // Reset the initial click coordinates to the last circle of the previous polygon
+      if (polygonPoints.length > 0) {
+        setInitialClickCoordinates({
+          x: polygonPoints[polygonPoints.length - 1].x,
+          y: polygonPoints[polygonPoints.length - 1].y,
+        });
+      }
+    }
+  };
 
   return (
     <div style={{ display: 'flex' }}>
@@ -351,7 +405,7 @@ export default function Step2({handleBack, handleNext}) {
           <Tab label="Obstacles" style={{ fontWeight: 'bold' }} />
         </Tabs>
 
-        <div role="tabpanel" hidden={activeTab !== 0}>
+        <div role="tabpanel" style={{ display: activeTab !== 0 ? 'none' : 'block' }}>
           <Box
             display="flex"
             flexDirection="column"
@@ -484,23 +538,24 @@ export default function Step2({handleBack, handleNext}) {
             />
 
             <Button
-              disabled={!canDrawCircles}
               style={{
-                backgroundColor: !canDrawCircles ? 'gray' : '#1a83ff',
-                color: 'white',
+                //  Apply different styles when the "Add Polygon" button is clickable
+                backgroundColor: isAddingPolygon ? 'lightblue' : !canDrawCircles ? 'gray' : '#1a83ff',
+                color: isDrawing ? 'lightblue' : 'white',
               }}
+              disabled={!canDrawCircles}
               onClick={handleCreateClick}
             >
-              {isDrawingPolygon ? 'Add Points' : 'Add Polygone'}
+              Add Polygon
             </Button>
 
-
             <Button
-              disabled={!canDrawCircles}
               style={{
-                backgroundColor: !canDrawCircles ? 'gray' : '#1a83ff',
-                color: 'white',
+                // Apply different styles when the "Add Rectangle" button is clickable
+                backgroundColor: isAddingRectangle ? 'lightblue' : !canDrawCircles ? 'gray' : '#1a83ff',
+                color: isDrawing ? 'lightblue' : 'white',
               }}
+              disabled={!canDrawCircles}
               onClick={handleAddRectangleClick}
             >
               Add Rectangle
@@ -514,7 +569,7 @@ export default function Step2({handleBack, handleNext}) {
                   label="Width"
                   value={rectWidth}
                   onChange={(e) => handleNumberInput(e.target.value, setRectWidth)}
-                  sx={{ m: 1, width: '100px' }}
+                  sx={{ m: 1, width: '120px' }}
                   InputProps={{
                     endAdornment: <InputAdornment position="end">m</InputAdornment>,
                   }}
@@ -524,7 +579,7 @@ export default function Step2({handleBack, handleNext}) {
                   label="Height"
                   value={rectHeight}
                   onChange={(e) => handleNumberInput(e.target.value, setRectHeight)}
-                  sx={{ m: 1, width: '100px' }}
+                  sx={{ m: 1, width: '120px' }}
                   InputProps={{
                     endAdornment: <InputAdornment position="end">m</InputAdornment>,
                   }}
@@ -539,8 +594,6 @@ export default function Step2({handleBack, handleNext}) {
                 </Button>
               </DialogActions>
             </Dialog>
-
-
 
             {/* New "Reset" button to reset the shape to the previous state it was in */}
             <Button
@@ -561,8 +614,6 @@ export default function Step2({handleBack, handleNext}) {
             >
               Clear Canvas
             </Button>
-
-
         </Box>
         </div>
 
@@ -573,7 +624,7 @@ export default function Step2({handleBack, handleNext}) {
               Back
             </Button>
           </div>
-          <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '1rem', marginLeft: '8rem' }}>
+          <div style={{ display: activeTab === 0 ? 'flex' : 'none', justifyContent: 'flex-end', marginTop: '1rem', marginLeft: '8rem' }}>
             <Button onClick={handleNext} style={{ backgroundColor: '#1a83ff', color: 'white' }}>
               Next
             </Button>
@@ -584,10 +635,24 @@ export default function Step2({handleBack, handleNext}) {
       <div style={{ flex: 2, marginRight: '1rem', marginTop: '1rem' }}>
         <div
           style={{ width: '40rem', height: '15rem' }}
-         onDoubleClick={handleSVGDoubleClick}
+          onDoubleClick={handleSVGDoubleClick}
         >
-          <UncontrolledReactSVGPanZoom ref={Viewer} width={800} height={600} onChangeValue={handleZoomChange}>
-            <svg width="500px" height="500px" viewBox={`0 0 ${800} ${600}`} style={{ overflow: 'visible' }}>
+          <ReactSVGPanZoom 
+          style={{ outline: '1px solid black' }}
+          ref={Viewer} 
+          width={800}  
+          height={600} 
+          tool={tool}
+          value={{a: zoomLevel, mode: tool}}
+          onChangeValue={handleZoomChange} 
+          onChangeTool={handleChangeTool}>
+            
+            <svg 
+            width="500px" height="500px" 
+            viewBox={`0 0 ${800} ${600}`} 
+            style={{ overflow: 'visible' }}
+            >
+
               {allRoofFieldsFilled && <image x="0" y="0" width="500" height="500" href={rugged} />}
 
               {/* Render completed polygons */}
@@ -610,23 +675,27 @@ export default function Step2({handleBack, handleNext}) {
               <g>
                 {isDrawingPolygon &&
                   polygonPoints.map((point, index) => (
-                    <circle key={index} cx={point.x} cy={point.y} r="5" fill="red" />
+                    <circle 
+                    key={index} 
+                    cx={point.x  / zoomLevel} 
+                    cy={point.y / zoomLevel} 
+                    r="5" 
+                    fill={index === 0 ? firstCircleColor : 'red'} />
                   ))}
 
                 {/* Render the initial circle */}
                 {isDrawingPolygon && polygonPoints.length > 0 && (
                   <circle
-                    cx={initialClickCoordinates.x}
-                    cy={initialClickCoordinates.y}
+                    cx={initialClickCoordinates.x / zoomLevel}
+                    cy={initialClickCoordinates.y / zoomLevel}
                     r="5"
-                    fill="red"
+                    fill={firstCircleColor}
                     onClick={handlePolygonComplete} // Call the new function to complete the polygon
                   />
                 )}
               </g>
             </svg>
-          </UncontrolledReactSVGPanZoom>
-
+          </ReactSVGPanZoom>
         </div>
       </div>
     </div>

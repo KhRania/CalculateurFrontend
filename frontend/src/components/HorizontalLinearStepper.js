@@ -9,8 +9,8 @@ import { Button } from '@mui/material';
 import CreateProject from './CreateProject';
 import EnvPage from './EnvPage';
 
-// Array to hold the labels for each step
-const steps = ['', '', ''];
+// Update the step labels in the steps array
+const steps = ['Project Info', 'Building', 'Environment'];
 
 export default function HorizontalLinearStepper() {
   const [activeStep, setActiveStep] = React.useState(0);
@@ -29,28 +29,16 @@ export default function HorizontalLinearStepper() {
     setActiveStep(0);
   };
 
-  const getStepLabel = (stepIndex) => {
-    // Determening the label for each step based on the step index
-    if (stepIndex === 0) {
-      return 'Step One';
-    } else if (stepIndex === 1) {
-      return 'Step Two';
-    } else if (stepIndex === 2) {
-      return 'Step Three';
-    }
-    return '';
-  };
-
   return (
     <Box sx={{ width: '100%' }}>
       <Stepper activeStep={activeStep}>
-        {steps.map((_, index) => {
+        {steps.map((label, index) => {
           const stepProps = {};
           const labelProps = {};
           return (
             // render Step component for each step in the array
             <Step sx={{ marginTop: 1 }} key={index} {...stepProps}>
-              <StepLabel {...labelProps}>{getStepLabel(index)}</StepLabel>
+              <StepLabel {...labelProps}>{label}</StepLabel>
             </Step>
           );
         })}

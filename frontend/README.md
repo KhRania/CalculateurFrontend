@@ -92,6 +92,12 @@ React Router provides a set of components that enable you to define routes and t
 
 **Documentation :** https://reactrouter.com/en/main
 
+### react-svg-pan-zoom
+
+We used this library to enbale drawing polgones that represent the roof and the obstacles inside that rooft to visualize the optimal placement of the solar panels. 
+
+**Documentation :** https://github.com/chrvadala/react-svg-pan-zoom/blob/main/docs/autosizer-viewer.md
+
 #### Implementation 
 
 * We wrapped the App component in the `index.js` file with the necessary Router type.
