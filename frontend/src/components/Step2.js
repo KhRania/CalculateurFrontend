@@ -36,6 +36,13 @@ export default function Step2({handleBack, handleNext}) {
   const [isAddingPolygon, setIsAddingPolygon] = React.useState(false);
   const [isAddingRectangle, setIsAddingRectangle] = React.useState(false);
   const [isDrawing, setIsDrawing] = React.useState(false);
+  const [isAddingPolygonRoof, setIsAddingPolygonRoof] = React.useState(false);
+  const [isAddingRectangleRoof, setIsAddingRectangleRoof] = React.useState(false);
+  const [canDrawCirclesRoof, setCanDrawCirclesRoof] = React.useState(false);
+  const [isDrawingPolygonRoof, setIsDrawingPolygonRoof] = React.useState(false);
+
+
+
 
 
   ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -159,8 +166,10 @@ export default function Step2({handleBack, handleNext}) {
       parapetHeight !== ''
     ) {
       setAllRoofFieldsFilled(true);
+      setCanDrawCirclesRoof(true);
     } else {
       setAllRoofFieldsFilled(false);
+      setCanDrawCirclesRoof(false);
     }
   };
 
@@ -178,6 +187,21 @@ export default function Step2({handleBack, handleNext}) {
   // useEffect to check for changes in text field values and other conditions. 
   React.useEffect(() => {
     checkAllRoofFieldsFilled();
+    // Update the state to indicate that drawing is in progress
+    if (isDrawingPolygon && polygonPoints.length > 0) {
+      setIsDrawing(true);
+    } else {
+      setIsDrawing(false);
+    }
+    // Call the function to handle drawing completion when the polygon is complete
+    if (isDrawingPolygon && isPolygonComplete) {
+      handleDrawingComplete();
+    }
+  }, [roofHeight, distanceBoard, pente, membraneType, parapetHeight]);
+
+
+   // useEffect to check for changes in text field values and other conditions. 
+   React.useEffect(() => {
     checkAllObstacleFieldsFilled();
     // Update the state to indicate that drawing is in progress
     if (isDrawingPolygon && polygonPoints.length > 0) {
@@ -189,7 +213,7 @@ export default function Step2({handleBack, handleNext}) {
     if (isDrawingPolygon && isPolygonComplete) {
       handleDrawingComplete();
     }
-  }, [roofHeight, distanceBoard, pente, membraneType, parapetHeight, obstacleHeight, offsetZone]);
+  }, [ obstacleHeight, offsetZone]);
 
 
   // function to handle input validation for numbers
@@ -214,10 +238,24 @@ export default function Step2({handleBack, handleNext}) {
   };
 
   const handleSVGDoubleClick = (e) => {
-    if (canDrawCircles) {
+    if (activeTab === 1 && canDrawCircles) {
       const svgRect = e.target.getBoundingClientRect();
       const svgX = (e.clientX - svgRect.left) / zoomLevel;
       const svgY = (e.clientY - svgRect.top) / zoomLevel; 
+  
+      // Create initial circle when "Create" button is clicked
+      if (!isPolygonComplete) {
+        setPolygonPoints([{ x: svgX, y: svgY }]);
+        setInitialClickCoordinates({ x: svgX, y: svgY }); // Store initial click coordinates
+        setPolygonComplete(true);
+      } else {
+        // Add new point to the polygon if it's not the initial circle
+        addPolygonPoint(svgX, svgY);
+      }
+    } else if (activeTab === 0 && canDrawCirclesRoof) {
+      const svgRect = e.target.getBoundingClientRect();
+      const svgX = (e.clientX - svgRect.left) / zoomLevel;
+      const svgY = (e.clientY - svgRect.top) / zoomLevel;
   
       // Create initial circle when "Create" button is clicked
       if (!isPolygonComplete) {
@@ -336,6 +374,31 @@ export default function Step2({handleBack, handleNext}) {
       }
     }
   };
+
+  const handleCreateClickRoof = () => {
+    if (allRoofFieldsFilled) {
+      setIsAddingPolygonRoof(true);
+      localStorage.setItem('polygons', JSON.stringify(polygons));
+      setIsDrawingPolygon(true);
+      setPolygonComplete(false);
+      setFirstCircleColor('green');
+      setPolygonPoints([]);
+      if (polygonPoints.length > 0) {
+        setInitialClickCoordinates({
+          x: polygonPoints[polygonPoints.length - 1].x,
+          y: polygonPoints[polygonPoints.length - 1].y,
+        });
+      }
+    }
+  };
+  
+  const handleAddRectangleClickRoof = () => {
+    if (allRoofFieldsFilled) {
+      setIsAddingRectangleRoof(true);
+      setIsDialogOpen(true);
+    }
+  };
+  
   
    // Add this useEffect to clear polygons on component mount
    React.useEffect(() => {
@@ -494,6 +557,51 @@ export default function Step2({handleBack, handleNext}) {
               <MenuItem value="Option 4">EPDM</MenuItem>
               <MenuItem value="Option 5">Other</MenuItem>
             </TextField>
+            
+            <Button
+              style={{
+                backgroundColor: isAddingPolygonRoof ? 'lightblue' : !canDrawCirclesRoof ? 'gray' : '#1a83ff',
+                color: isDrawingPolygonRoof ? 'lightblue' : 'white',
+              }}
+              disabled={!canDrawCirclesRoof}
+              onClick={handleCreateClickRoof}
+            >
+              Add Polygon
+            </Button>
+
+            <Button
+              style={{
+                backgroundColor: isAddingRectangleRoof ? 'lightblue' : !canDrawCirclesRoof ? 'gray' : '#1a83ff',
+                color: isDrawingPolygonRoof ? 'lightblue' : 'white',
+              }}
+              disabled={!canDrawCirclesRoof}
+              onClick={handleAddRectangleClickRoof}
+            >
+              Add Rectangle
+            </Button>
+
+
+
+            {/* New "Reset" button to reset the shape to the previous state it was in */}
+            <Button
+              disabled={isDrawingPolygon && polygonPoints.length === 0}
+              style={{
+                backgroundColor: isDrawingPolygon && polygonPoints.length === 0 ? 'gray' : '#1a83ff',
+                color: 'white',
+              }}
+              onClick={handleResetClick}
+            >
+              Reset
+            </Button>
+
+            {/* New "Clear Canvas" button to clear everything from the canvas */}
+            <Button
+              style={{ backgroundColor: '#ff1a1a', color: 'white' }}
+              onClick={handleClearCanvasClick}
+            >
+              Clear Canvas
+            </Button>
+        
           </Box>
         </div>
 
@@ -652,8 +760,6 @@ export default function Step2({handleBack, handleNext}) {
             viewBox={`0 0 ${800} ${600}`} 
             style={{ overflow: 'visible' }}
             >
-
-              {allRoofFieldsFilled && <image x="0" y="0" width="500" height="500" href={rugged} />}
 
               {/* Render completed polygons */}
               {polygons.map((polygon, index) => (
