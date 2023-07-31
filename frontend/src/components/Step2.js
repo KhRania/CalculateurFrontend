@@ -2,16 +2,19 @@ import * as React from 'react';
 import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
 import { Button, InputAdornment, MenuItem } from '@mui/material';
-import { ReactSVGPanZoom, TOOL_NONE } from 'react-svg-pan-zoom';
+import { ReactSVGPanZoom, TOOL_AUTO} from 'react-svg-pan-zoom';
 import { Tab, Tabs } from '@mui/material';
 import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
 import DialogContent from '@mui/material/DialogContent';
 import DialogActions from '@mui/material/DialogActions';
+import _ from 'lodash';
+import { ComponentProps } from 'react';
+// import MapComponent from './MapComponent';
+// import Polygone from './Polygone';
 import rugged from '../assets/rugged_terrain.png';
 
-
-export default function Step2({handleBack, handleNext}) {
+export default function Step2({handleBack, handleNext, props}) {
   const [obstacleHeight , setObstacleHeight] = React.useState('');
   const [offsetZone, setOffsetZone] = React.useState('');
   const [roofHeight , setRoofHeight] = React.useState('');
@@ -42,7 +45,151 @@ export default function Step2({handleBack, handleNext}) {
   const [isDrawingPolygonRoof, setIsDrawingPolygonRoof] = React.useState(false);
 
 
+  const [areas, setAreas] = React.useState([]);
+  const [positionAreaX, setPositionAreaX] = React.useState(0);
+  const [positionAreaY, setPositionAreaY] = React.useState(0);
+  const [counterArea, setCounterArea] = React.useState(0);
+  const [CircleArea1, setCircleArea1] = React.useState(false);
+  const [clickedCircleArea, setClickedCircleArea] = React.useState(0);
+  const [clickedCirclePatrol, setClickedCirclePatrol] = React.useState(-1);
+  const [newArea, setNewArea] = React.useState(false);
 
+  const onMouseAddArea = (x, y) => {
+    if (areas) {
+      if (
+        React.Component.display &&
+        React.Component.addRect &&
+        !React.Component.editArea &&
+        !React.Component.deleteOnce
+      ) {
+        setPositionAreaX(x);
+        setPositionAreaY(y);
+
+        const zonefini = localStorage.getItem("zonefini");
+        const newzone = localStorage.getItem("newzone");
+        if (
+          _.isEmpty(areas) ||
+          newArea === true ||
+          zonefini === "true" ||
+          newzone === "true" ||
+          React.Component.get === true
+        ) {
+          //props.onClickAddArea()
+          //console.log(areas.length)
+          handleSVGDoubleClick();
+          const newAreaData = {
+            points: [
+              {
+                position: {
+                  y: y,
+                  x: x,
+                  theta: 0,
+                },
+                priority: 1,
+              },
+            ],
+            type: 0,
+            name: "Area " + areas.length,
+          };
+          setAreas([...areas, newAreaData]);
+          setCounterArea(areas.length - 1);
+          setCircleArea1(false);
+          setClickedCirclePatrol(-1);
+          setNewArea(false);
+          localStorage.setItem("zonefini", false);
+          localStorage.setItem("newzone", false);
+        } else {
+          let areasNew = areas.slice();
+
+          areasNew.forEach((item, i) => {
+            if (i === counterArea) {
+              const objPoint = {
+                position: {
+                  y: y,
+                  x: x,
+                  theta: 0,
+                },
+                priority: 1,
+              };
+              item.points.push(objPoint);
+
+              if (clickedCircleArea === 0) {
+                let xFirst = item.points[0].position.x;
+                let yFirst = item.points[0].position.y;
+                // this.state.xLast = item.points[0].position.x;
+                // this.state.yLast = item.points[0].position.y;
+
+                item.points.pop();
+                const objPointI = {
+                  position: {
+                    y: yFirst,
+                    x: xFirst,
+                    theta: 0,
+                  },
+                  priority: 1,
+                };
+                item.points.push(objPointI);
+              }
+            }
+          });
+          // setAreas(areasNew);
+        }
+
+        if (clickedCircleArea === 0) {
+          setCounterArea(counterArea + 1);
+          // this.setState({
+          //   counter: this.state.counter + 1,
+          //   newArea: true,
+          // });
+
+          setCircleArea1(true);
+          setClickedCircleArea(-1);
+          setClickedCirclePatrol(-1);
+          localStorage.setItem("zonefini", CircleArea1);
+        }
+        // setAreas(areas);
+      }
+    }
+  }
+
+  const [dragging, setDragging] = React.useState(false);
+  const coordsRef = React.useRef({ x: 0, y: 0 });
+  const [state1, setState1] = React.useState({
+    x: React.Component.x,
+    y: React.Component.y,
+    id: React.Component.id,
+    name: React.Component.name,
+  });
+
+  const handleMouseDown = (e) => {
+    setDragging(
+      (React.Component.id === React.Component.selected &&
+        React.Component.name === React.Component.areaName) ||
+      (React.Component.clickedDrag &&
+        React.Component.id === React.Component.selected &&
+        React.Component.name === React.Component.areaName)
+    );
+
+    coordsRef.current = {
+      x: e.pageX,
+      y: e.pageY,
+    };
+
+    window.addEventListener("mouseup", handleMouseUp, true);
+  };
+
+  const handleMouseUp = () => {
+    setDragging(false);
+    coordsRef.current = {};
+    window.removeEventListener("mouseup", handleMouseUp, true);
+  };
+
+  // Clean up the event listener when the component unmounts
+  React.useEffect(() => {
+    return () => {
+      window.removeEventListener("mouseup", handleMouseUp, true);
+    };
+  }, []);
 
 
   ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -77,8 +224,8 @@ export default function Step2({handleBack, handleNext}) {
       const newRectangle = (
         <rect
           key={rectangles.length} // Assign a unique key to the rectangle
-          x={startX}
-          y={startY}
+          x={startX / zoomLevel}
+          y={startY / zoomLevel}
           width={parseFloat(rectWidth)}
           height={parseFloat(rectHeight)}
           fill='transparent'
@@ -99,9 +246,6 @@ export default function Step2({handleBack, handleNext}) {
   
   ////////////////////////////////////////////////////////////////////////////
   
-  
-
-
 
   const roofHeightError = roofHeightTouched  && roofHeight=== ''; 
   const distanceBoardError = distanceBoardTouched && distanceBoard === '';
@@ -230,7 +374,7 @@ export default function Step2({handleBack, handleNext}) {
     y: 0,
   }); 
   const [zoomLevel, setZoomLevel] = React.useState(1);
-  const [tool, setTool] = React.useState('auto'); // Set the initial tool to 'auto' for automatic panning
+  const [tool, setTool] = React.useState(TOOL_AUTO); // Set the initial tool to 'auto' for automatic panning
 
    // Function to add a new point to the polygon
    const addPolygonPoint = (x, y) => {
@@ -455,6 +599,7 @@ export default function Step2({handleBack, handleNext}) {
       }
     }
   };
+
 
   return (
     <div style={{ display: 'flex' }}>
@@ -700,7 +845,7 @@ export default function Step2({handleBack, handleNext}) {
                 <Button onClick={handleApplyClick} color="primary">
                   Apply
                 </Button>
-              </DialogActions>
+              </DialogActions> 
             </Dialog>
 
             {/* New "Reset" button to reset the shape to the previous state it was in */}
@@ -744,10 +889,11 @@ export default function Step2({handleBack, handleNext}) {
         <div
           style={{ width: '40rem', height: '15rem' }}
           onDoubleClick={handleSVGDoubleClick}
+          onMouseDown={(e) => handleMouseDown(e)}
         >
           <ReactSVGPanZoom 
           style={{ outline: '1px solid black' }}
-          ref={Viewer} 
+          ref={Viewer}
           width={800}  
           height={600} 
           tool={tool}
@@ -765,7 +911,7 @@ export default function Step2({handleBack, handleNext}) {
               {polygons.map((polygon, index) => (
                 <polyline
                   key={index}
-                  points={polygon.map((point) => `${point.x},${point.y}`).join(' ')}
+                  points={polygon.map((point) => `${point.x },${point.y }`).join(' ')}
                   fill="none"
                   stroke="blue"
                 />
@@ -778,13 +924,13 @@ export default function Step2({handleBack, handleNext}) {
               {rectangles.map((rectangle, index) => rectangle)}
 
               {/* Group to hold the circles and lines of the current polygon */}
-              <g>
+              
                 {isDrawingPolygon &&
                   polygonPoints.map((point, index) => (
                     <circle 
                     key={index} 
-                    cx={point.x  / zoomLevel} 
-                    cy={point.y / zoomLevel} 
+                    cx={point.x } 
+                    cy={point.y } 
                     r="5" 
                     fill={index === 0 ? firstCircleColor : 'red'} />
                   ))}
@@ -792,14 +938,14 @@ export default function Step2({handleBack, handleNext}) {
                 {/* Render the initial circle */}
                 {isDrawingPolygon && polygonPoints.length > 0 && (
                   <circle
-                    cx={initialClickCoordinates.x / zoomLevel}
-                    cy={initialClickCoordinates.y / zoomLevel}
+                    cx={initialClickCoordinates.x }
+                    cy={initialClickCoordinates.y }
                     r="5"
                     fill={firstCircleColor}
                     onClick={handlePolygonComplete} // Call the new function to complete the polygon
                   />
                 )}
-              </g>
+              
             </svg>
           </ReactSVGPanZoom>
         </div>
